@@ -1,0 +1,19 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: WordPress stack
+Resources:
+  KiraQuickConnect1:
+    Type: AWS::Connect::QuickConnect
+    Properties:
+      Name: QuickConnectCFN-1
+      InstanceId: d88ca54f-68aa-4d5f-85ec-8dd098a9ef7a
+      QueueId: ce7c784d-3ce5-4005-9dc7-67f87050463b
+      ContactFlowId: bd66185e-ff5f-4720-a49f-14d3adbdfa04
+  KiraQuickConnect2:
+    Type: AWS::Connect::QuickConnect
+    Properties:
+      Name: QuickConnectCFN-2
+      InstanceId: d88ca54f-68aa-4d5f-85ec-8dd098a9ef7a
+      QueueId: ce7c784d-3ce5-4005-9dc7-67f87050463b
+      ContactFlowId: bd66185e-ff5f-4720-a49f-14d3adbdfa04
+
