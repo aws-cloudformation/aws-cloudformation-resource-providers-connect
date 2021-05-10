@@ -1,18 +1,18 @@
 {
-    "Name": "QuickConnectCFNQueueWithTagCT7",
-    "Description": "quick connect created using cfn",
-    "InstanceId": "181acb51-1ce5-4a03-8de8-1a123c6e4c6e",
-    "QuickConnectConfig": {
-        "QuickConnectType": "QUEUE",
-        "QueueConfig": {
-            "ContactFlowId": "49cf04c5-5481-44a4-a82e-a0507e4c79ce",
-            "QueueId": "523cdb52-3f59-42fa-af98-00271dc65d09"
-        }
-    },
-    "Tags": [
-        {
-            "Key": "test",
-            "Value": "test"
-        }
-    ]
+  "Name": "QuickConnectCFNQueueWithTagCT7",
+  "Description": "quick connect created using cfn",
+  "InstanceId": "181acb51-1ce5-4a03-8de8-1a123c6e4c6e",
+  "QuickConnectConfig": {
+    "QuickConnectType": "QUEUE",
+    "QueueConfig": {
+      "ContactFlowId": "49cf04c5-5481-44a4-a82e-a0507e4c79ce",
+      "QueueId": "523cdb52-3f59-42fa-af98-00271dc65d09"
+    }
+  },
+  "Tags": [
+    {
+      "Key": "test",
+      "Value": "test"
+    }
+  ]
 }

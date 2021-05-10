@@ -113,4 +113,3 @@ The ID of the quick connect
 #### QuickConnectARN
 
 The Amazon Resource Name (ARN) for the quick connect.
-

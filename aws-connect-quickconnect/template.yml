@@ -21,4 +21,3 @@ Resources:
       Handler: software.amazon.connect.quickconnect.HandlerWrapper::testEntrypoint
       Runtime: java8
       CodeUri: ./target/aws-connect-quickconnect-handler-1.0-SNAPSHOT.jar
-
