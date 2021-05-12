@@ -52,7 +52,7 @@
       }
     },
     "UserQuickConnectConfig": {
-      "description": "The QueueConfig of the quick connect",
+      "description": "The user configuration. This is required only if QuickConnectType is USER.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
