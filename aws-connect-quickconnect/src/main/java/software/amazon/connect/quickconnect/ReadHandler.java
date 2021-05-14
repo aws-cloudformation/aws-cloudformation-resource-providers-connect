@@ -46,21 +46,21 @@ public class ReadHandler extends BaseHandlerStd {
         resourceModelQuickConnectConfig.setQuickConnectType(quickConnectType);
 
         if (quickConnectType.equals(QuickConnectType.USER.toString())) {
-            software.amazon.connect.quickconnect.UserQuickConnectConfig userQuickConnectConfig = new software.amazon.connect.quickconnect.UserQuickConnectConfig();
+            final software.amazon.connect.quickconnect.UserQuickConnectConfig userQuickConnectConfig = new software.amazon.connect.quickconnect.UserQuickConnectConfig();
             userQuickConnectConfig.setUserId(quickConnectConfig.userConfig().userId());
             userQuickConnectConfig.setContactFlowId(quickConnectConfig.userConfig().contactFlowId());
             resourceModelQuickConnectConfig.setUserConfig(userQuickConnectConfig);
         }
 
         if (quickConnectType.equals(QuickConnectType.QUEUE.toString())) {
-            software.amazon.connect.quickconnect.QueueQuickConnectConfig queueQuickConnectConfig = new software.amazon.connect.quickconnect.QueueQuickConnectConfig();
+            final software.amazon.connect.quickconnect.QueueQuickConnectConfig queueQuickConnectConfig = new software.amazon.connect.quickconnect.QueueQuickConnectConfig();
             queueQuickConnectConfig.setQueueId(quickConnectConfig.queueConfig().queueId());
             queueQuickConnectConfig.setContactFlowId(quickConnectConfig.queueConfig().contactFlowId());
             resourceModelQuickConnectConfig.setQueueConfig(queueQuickConnectConfig);
         }
 
         if (quickConnectType.equals(QuickConnectType.PHONE_NUMBER.toString())) {
-            software.amazon.connect.quickconnect.PhoneNumberQuickConnectConfig phoneNumberQuickConnectConfig = new software.amazon.connect.quickconnect.PhoneNumberQuickConnectConfig();
+            final software.amazon.connect.quickconnect.PhoneNumberQuickConnectConfig phoneNumberQuickConnectConfig = new software.amazon.connect.quickconnect.PhoneNumberQuickConnectConfig();
             phoneNumberQuickConnectConfig.setPhoneNumber(quickConnectConfig.phoneConfig().phoneNumber());
             resourceModelQuickConnectConfig.setPhoneConfig(phoneNumberQuickConnectConfig);
         }

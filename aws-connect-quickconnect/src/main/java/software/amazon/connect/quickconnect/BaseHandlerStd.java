@@ -100,7 +100,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
             requireNotNull(model.getQuickConnectConfig().getUserConfig(), QUICK_CONNECT_USER_CONFIG);
             requireNotNull(model.getQuickConnectConfig().getUserConfig().getUserId(), USER_ID);
             requireNotNull(model.getQuickConnectConfig().getUserConfig().getContactFlowId(), CONTACT_FLOW_ID);
-            software.amazon.awssdk.services.connect.model.UserQuickConnectConfig userQuickConnectConfig = UserQuickConnectConfig.builder()
+            final software.amazon.awssdk.services.connect.model.UserQuickConnectConfig userQuickConnectConfig = UserQuickConnectConfig.builder()
                     .userId(model.getQuickConnectConfig().getUserConfig().getUserId())
                     .contactFlowId(model.getQuickConnectConfig().getUserConfig().getContactFlowId())
                     .build();
@@ -112,7 +112,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
             requireNotNull(model.getQuickConnectConfig().getQueueConfig(), QUICK_CONNECT_QUEUE_CONFIG);
             requireNotNull(model.getQuickConnectConfig().getQueueConfig().getQueueId(), QUEUE_ID);
             requireNotNull(model.getQuickConnectConfig().getQueueConfig().getContactFlowId(), CONTACT_FLOW_ID);
-            software.amazon.awssdk.services.connect.model.QueueQuickConnectConfig queueQuickConnectConfig = QueueQuickConnectConfig.builder()
+            final software.amazon.awssdk.services.connect.model.QueueQuickConnectConfig queueQuickConnectConfig = QueueQuickConnectConfig.builder()
                     .queueId(model.getQuickConnectConfig().getQueueConfig().getQueueId())
                     .contactFlowId(model.getQuickConnectConfig().getQueueConfig().getContactFlowId())
                     .build();
@@ -123,7 +123,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
         } else if (quickConnectType.equals(QuickConnectType.PHONE_NUMBER.toString())) {
             requireNotNull(model.getQuickConnectConfig().getPhoneConfig(), QUICK_CONNECT_PHONE_CONFIG);
             requireNotNull(model.getQuickConnectConfig().getPhoneConfig().getPhoneNumber(), PHONE_NUMBER);
-            software.amazon.awssdk.services.connect.model.PhoneNumberQuickConnectConfig phoneNumberQuickConnectConfig = PhoneNumberQuickConnectConfig.builder()
+            final software.amazon.awssdk.services.connect.model.PhoneNumberQuickConnectConfig phoneNumberQuickConnectConfig = PhoneNumberQuickConnectConfig.builder()
                     .phoneNumber(model.getQuickConnectConfig().getPhoneConfig().getPhoneNumber())
                     .build();
             return QuickConnectConfig.builder()
@@ -142,7 +142,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
                 .orElse(Sets.newHashSet());
     }
 
-    protected static void requireNotNull(final Object object,final String parameterName) {
+    protected static void requireNotNull(final Object object, final String parameterName) {
         if (object == null) {
             throw new CfnInvalidRequestException(String.format(MISSING_MANDATORY_PARAMETER, parameterName));
         }

@@ -28,10 +28,10 @@ public class QuickConnectTestDataProvider {
     protected static final String QUICK_CONNECT_DESCRIPTION_THREE = "quickConnectDescriptionThree";
     protected static final String VALID_TAG_KEY_ONE = "TagKeyOne";
     protected static final String VALID_TAG_VALUE_ONE = "A";
-    protected  static final String VALID_TAG_KEY_TWO = "TagKeyTwo";
-    protected  static final String VALID_TAG_VALUE_TWO = "B";
-    protected  static final String VALID_TAG_KEY_THREE = "TagKeyThree";
-    protected  static final String VALID_TAG_VALUE_THREE = "C";
+    protected static final String VALID_TAG_KEY_TWO = "TagKeyTwo";
+    protected static final String VALID_TAG_VALUE_TWO = "B";
+    protected static final String VALID_TAG_KEY_THREE = "TagKeyThree";
+    protected static final String VALID_TAG_VALUE_THREE = "C";
     protected static final Map<String, String> TAGS_ONE = ImmutableMap.of(VALID_TAG_KEY_ONE, VALID_TAG_VALUE_ONE);
     protected static final Map<String, String> TAGS_TWO = ImmutableMap.of(VALID_TAG_KEY_THREE, VALID_TAG_VALUE_THREE,
             VALID_TAG_KEY_TWO, VALID_TAG_VALUE_TWO);
@@ -41,14 +41,14 @@ public class QuickConnectTestDataProvider {
     protected static final Set<Tag> TAGS_SET_TWO = convertTagMapToSet(TAGS_TWO);
 
     protected static QuickConnect getDescribeQuickConnectResponseObjectWithQuickConnectTypeUser() {
-        software.amazon.awssdk.services.connect.model.UserQuickConnectConfig userQuickConnectConfig =
+        final software.amazon.awssdk.services.connect.model.UserQuickConnectConfig userQuickConnectConfig =
                 software.amazon.awssdk.services.connect.model.UserQuickConnectConfig
                         .builder()
                         .contactFlowId(CONTACT_FLOW_ID)
                         .userId(USER_ID)
                         .build();
 
-        software.amazon.awssdk.services.connect.model.QuickConnectConfig quickConnectConfigTypeUser = software.amazon.awssdk.services.connect.model.QuickConnectConfig
+        final software.amazon.awssdk.services.connect.model.QuickConnectConfig quickConnectConfigTypeUser = software.amazon.awssdk.services.connect.model.QuickConnectConfig
                 .builder()
                 .quickConnectType(QuickConnectType.USER.toString())
                 .userConfig(userQuickConnectConfig)
@@ -65,14 +65,14 @@ public class QuickConnectTestDataProvider {
     }
 
     protected static QuickConnect getDescribeQuickConnectResponseObjectWithQuickConnectTypeQueue() {
-        software.amazon.awssdk.services.connect.model.QueueQuickConnectConfig queueQuickConnectConfig =
+        final software.amazon.awssdk.services.connect.model.QueueQuickConnectConfig queueQuickConnectConfig =
                 software.amazon.awssdk.services.connect.model.QueueQuickConnectConfig
                         .builder()
                         .contactFlowId(CONTACT_FLOW_ID)
                         .queueId(QUEUE_ID)
                         .build();
 
-        software.amazon.awssdk.services.connect.model.QuickConnectConfig quickConnectConfigTypeQueue = software.amazon.awssdk.services.connect.model.QuickConnectConfig
+        final software.amazon.awssdk.services.connect.model.QuickConnectConfig quickConnectConfigTypeQueue = software.amazon.awssdk.services.connect.model.QuickConnectConfig
                 .builder()
                 .quickConnectType(QuickConnectType.QUEUE.toString())
                 .queueConfig(queueQuickConnectConfig)
@@ -89,13 +89,13 @@ public class QuickConnectTestDataProvider {
     }
 
     protected static QuickConnect getDescribeQuickConnectResponseObjectWithQuickConnectTypePhoneNumber() {
-        software.amazon.awssdk.services.connect.model.PhoneNumberQuickConnectConfig phoneNumberQuickConnectConfig =
+        final software.amazon.awssdk.services.connect.model.PhoneNumberQuickConnectConfig phoneNumberQuickConnectConfig =
                 software.amazon.awssdk.services.connect.model.PhoneNumberQuickConnectConfig
                         .builder()
                         .phoneNumber(PHONE_NUMBER)
                         .build();
 
-        software.amazon.awssdk.services.connect.model.QuickConnectConfig quickConnectConfigTypePhoneNumber = software.amazon.awssdk.services.connect.model.QuickConnectConfig
+        final software.amazon.awssdk.services.connect.model.QuickConnectConfig quickConnectConfigTypePhoneNumber = software.amazon.awssdk.services.connect.model.QuickConnectConfig
                 .builder()
                 .quickConnectType(QuickConnectType.PHONE_NUMBER.toString())
                 .phoneConfig(phoneNumberQuickConnectConfig)
@@ -113,7 +113,7 @@ public class QuickConnectTestDataProvider {
 
     protected static ResourceModel buildQuickConnectResourceModelWithQuickConnectTypeUser() {
 
-        QuickConnectConfig quickConnectConfigTypeUser = QuickConnectConfig
+        final QuickConnectConfig quickConnectConfigTypeUser = QuickConnectConfig
                 .builder()
                 .quickConnectType(QuickConnectType.USER.toString())
                 .userConfig(getUserQuickConnectConfig())
@@ -131,7 +131,7 @@ public class QuickConnectTestDataProvider {
     }
 
     protected static ResourceModel buildQuickConnectResourceModelWithQuickConnectTypeQueue() {
-        QuickConnectConfig quickConnectConfigTypeQueue = QuickConnectConfig
+        final QuickConnectConfig quickConnectConfigTypeQueue = QuickConnectConfig
                 .builder()
                 .quickConnectType(QuickConnectType.QUEUE.toString())
                 .queueConfig(getQueueQuickConnectConfig())
@@ -150,7 +150,7 @@ public class QuickConnectTestDataProvider {
 
 
     protected static ResourceModel buildQuickConnectResourceModelWithQuickConnectTypePhoneNumber() {
-        QuickConnectConfig quickConnectConfigTypePhoneNumber = QuickConnectConfig
+        final QuickConnectConfig quickConnectConfigTypePhoneNumber = QuickConnectConfig
                 .builder()
                 .quickConnectType(QuickConnectType.PHONE_NUMBER.toString())
                 .phoneConfig(getPhoneQuickConnectConfig())

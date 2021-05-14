@@ -62,10 +62,11 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 #### UserConfig
 
-The QueueConfig of the quick connect
+The user configuration. This is required only if QuickConnectType is USER.
 
 _Required_: No
 
 _Type_: <a href="userquickconnectconfig.md">UserQuickConnectConfig</a>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+

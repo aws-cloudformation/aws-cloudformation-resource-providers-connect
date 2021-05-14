@@ -1,6 +1,5 @@
 package software.amazon.connect.quickconnect;
 
-import org.apache.commons.collections.MapUtils;
 import software.amazon.awssdk.services.connect.ConnectClient;
 import software.amazon.awssdk.services.connect.model.CreateQuickConnectRequest;
 import software.amazon.awssdk.services.connect.model.CreateQuickConnectResponse;

@@ -57,8 +57,8 @@ public class UpdateHandler extends BaseHandlerStd {
                                                                                  final CallbackContext context,
                                                                                  final Logger logger) {
 
-        boolean updateQuickConnectName = !StringUtils.equals(desiredStateModel.getName(), previousStateModel.getName());
-        boolean updateQuickConnectDescription = !StringUtils.equals(desiredStateModel.getDescription(), previousStateModel.getDescription());
+        final boolean updateQuickConnectName = !StringUtils.equals(desiredStateModel.getName(), previousStateModel.getName());
+        final boolean updateQuickConnectDescription = !StringUtils.equals(desiredStateModel.getDescription(), previousStateModel.getDescription());
 
         if (updateQuickConnectName || updateQuickConnectDescription) {
             logger.log(String.format("Calling UpdateQuickConnectName API for QuickConnect:%s", desiredStateModel.getQuickConnectARN()));
