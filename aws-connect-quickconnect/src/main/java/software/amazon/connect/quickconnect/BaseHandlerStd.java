@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.awscore.AwsResponse;
 import software.amazon.awssdk.services.connect.ConnectClient;
+import software.amazon.awssdk.services.connect.model.ConnectException;
 import software.amazon.awssdk.services.connect.model.DuplicateResourceException;
 import software.amazon.awssdk.services.connect.model.InternalServiceException;
 import software.amazon.awssdk.services.connect.model.InvalidParameterException;
@@ -15,6 +16,7 @@ import software.amazon.awssdk.services.connect.model.QuickConnectType;
 import software.amazon.awssdk.services.connect.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.connect.model.ThrottlingException;
 import software.amazon.awssdk.services.connect.model.UserQuickConnectConfig;
+import software.amazon.cloudformation.exceptions.CfnAccessDeniedException;
 import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
@@ -43,6 +45,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     private static final String QUEUE_ID = "QueueId";
     private static final String CONTACT_FLOW_ID = "ContactFlowId";
     private static final String PHONE_NUMBER = "PhoneNumber";
+    private static final String ACCESS_DENIED_ERROR_CODE = "AccessDeniedException";
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
@@ -76,6 +79,8 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
             throw new CfnThrottlingException(ex);
         } else if (ex instanceof DuplicateResourceException) {
             throw new CfnAlreadyExistsException(ex);
+        } else if (ex instanceof ConnectException && ((ConnectException) ex).awsErrorDetails().errorCode().equals(ACCESS_DENIED_ERROR_CODE)) {
+            throw new CfnAccessDeniedException(ex);
         }
         logger.log(String.format("Exception in handler:%s", ex));
         throw new CfnGeneralServiceException(ex);

@@ -8,7 +8,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.awscore.AwsResponse;
+import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
 import software.amazon.awssdk.services.connect.ConnectClient;
+import software.amazon.awssdk.services.connect.model.ConnectException;
 import software.amazon.awssdk.services.connect.model.DuplicateResourceException;
 import software.amazon.awssdk.services.connect.model.InternalServiceException;
 import software.amazon.awssdk.services.connect.model.InvalidParameterException;
@@ -16,6 +18,7 @@ import software.amazon.awssdk.services.connect.model.InvalidRequestException;
 import software.amazon.awssdk.services.connect.model.QuickConnectType;
 import software.amazon.awssdk.services.connect.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.connect.model.ThrottlingException;
+import software.amazon.cloudformation.exceptions.CfnAccessDeniedException;
 import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
@@ -52,6 +55,7 @@ public class BaseHandlerStdTest {
     private static final String PARAMETER_NAME = "QuickConnectConfig";
     private static final String MISSING_MANDATORY_PARAMETER_EXCEPTION_MESSAGE = "Invalid request provided: Required parameter missing " + PARAMETER_NAME;
     private static final String INVALID_QUICK_CONNECT_TYPE = "InvalidQuickConnectType";
+    private static final String ACCESS_DENIED_ERROR_CODE = "AccessDeniedException";
 
     @Mock
     private ProxyClient<ConnectClient> proxyClient;
@@ -115,6 +119,18 @@ public class BaseHandlerStdTest {
     public void testHandleCommonExceptions_RuntimeException() {
         Exception ex = new RuntimeException();
         assertThrows(CfnGeneralServiceException.class, () ->
+                BaseHandlerStd.handleCommonExceptions(ex, logger));
+    }
+
+    @Test
+    public void testHandleCommonExceptions_AccessDeniedException() {
+        Exception ex = ConnectException.builder()
+                .statusCode(403)
+                .awsErrorDetails(AwsErrorDetails.builder()
+                        .errorCode(ACCESS_DENIED_ERROR_CODE)
+                        .build())
+                .build();
+        assertThrows(CfnAccessDeniedException.class, () ->
                 BaseHandlerStd.handleCommonExceptions(ex, logger));
     }
 

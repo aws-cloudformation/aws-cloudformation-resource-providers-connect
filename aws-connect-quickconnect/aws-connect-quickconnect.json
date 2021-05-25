@@ -164,8 +164,7 @@
     },
     "read": {
       "permissions": [
-        "connect:DescribeQuickConnect",
-        "connect:ListTagsForResource"
+        "connect:DescribeQuickConnect"
       ]
     },
     "delete": {

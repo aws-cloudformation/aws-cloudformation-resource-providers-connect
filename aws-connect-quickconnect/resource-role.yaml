@@ -26,7 +26,6 @@ Resources:
                 - "connect:CreateQuickConnect"
                 - "connect:DeleteQuickConnect"
                 - "connect:DescribeQuickConnect"
-                - "connect:ListTagsForResource"
                 - "connect:TagResource"
                 - "connect:UntagResource"
                 - "connect:UpdateQuickConnectConfig"
