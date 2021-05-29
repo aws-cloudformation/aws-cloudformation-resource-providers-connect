@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class QuickConnectTestDataProvider {
-    protected static final String QUICK_CONNECT_ARN = "quickConnectArn";
+    protected static final String QUICK_CONNECT_ARN = "arn:aws:connect:us-west-2:111111111111:instance/instanceId/transfer-destination/quickConnectId";
     protected static final String QUICK_CONNECT_ID = "quickConnectId";
     protected static final String CONTACT_FLOW_ID = "contactFlowId";
     protected static final String USER_ID = "userId";

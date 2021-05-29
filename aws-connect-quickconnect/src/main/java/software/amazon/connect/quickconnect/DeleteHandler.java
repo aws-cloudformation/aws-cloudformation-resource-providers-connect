@@ -32,7 +32,7 @@ public class DeleteHandler extends BaseHandlerStd {
     private DeleteQuickConnectRequest translateToDeleteQuickConnectRequest(final ResourceModel model) {
         return DeleteQuickConnectRequest
                 .builder()
-                .instanceId(model.getInstanceId())
+                .instanceId(getInstanceIdFromArn(model.getQuickConnectARN()))
                 .quickConnectId(model.getQuickConnectARN())
                 .build();
     }

@@ -34,7 +34,7 @@ public class ReadHandler extends BaseHandlerStd {
     private DescribeQuickConnectRequest translateToDescribeQuickConnectRequest(final ResourceModel model) {
         return DescribeQuickConnectRequest
                 .builder()
-                .instanceId(model.getInstanceId())
+                .instanceId(getInstanceIdFromArn(model.getQuickConnectARN()))
                 .quickConnectId(model.getQuickConnectARN())
                 .build();
     }
@@ -68,6 +68,8 @@ public class ReadHandler extends BaseHandlerStd {
     }
 
     private ResourceModel setQuickConnectProperties(final ResourceModel model, final QuickConnect quickConnect) {
+        model.setInstanceId(getInstanceIdFromArn(quickConnect.quickConnectARN()));
+        model.setQuickConnectId(quickConnect.quickConnectId());
         model.setName(quickConnect.name());
         model.setDescription(quickConnect.description());
         model.setQuickConnectConfig(translateToResourceModelQuickConnectConfig(quickConnect.quickConnectConfig()));

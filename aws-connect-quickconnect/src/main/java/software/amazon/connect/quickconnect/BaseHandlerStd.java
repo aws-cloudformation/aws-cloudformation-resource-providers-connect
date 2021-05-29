@@ -1,6 +1,8 @@
 package software.amazon.connect.quickconnect;
 
 import com.google.common.collect.Sets;
+import org.apache.commons.lang3.StringUtils;
+import software.amazon.awssdk.arns.Arn;
 import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.awscore.AwsResponse;
 import software.amazon.awssdk.services.connect.ConnectClient;
@@ -9,6 +11,7 @@ import software.amazon.awssdk.services.connect.model.DuplicateResourceException;
 import software.amazon.awssdk.services.connect.model.InternalServiceException;
 import software.amazon.awssdk.services.connect.model.InvalidParameterException;
 import software.amazon.awssdk.services.connect.model.InvalidRequestException;
+import software.amazon.awssdk.services.connect.model.LimitExceededException;
 import software.amazon.awssdk.services.connect.model.PhoneNumberQuickConnectConfig;
 import software.amazon.awssdk.services.connect.model.QueueQuickConnectConfig;
 import software.amazon.awssdk.services.connect.model.QuickConnectConfig;
@@ -22,6 +25,7 @@ import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
+import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
 import software.amazon.cloudformation.exceptions.CfnThrottlingException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
@@ -46,6 +50,8 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     private static final String CONTACT_FLOW_ID = "ContactFlowId";
     private static final String PHONE_NUMBER = "PhoneNumber";
     private static final String ACCESS_DENIED_ERROR_CODE = "AccessDeniedException";
+    private static final String INVALID_QUICK_CONNECT_ARN_EXCEPTION_MESSAGE = "QuickConnect Arn is invalid";
+    private static final String INVALID_QUICK_CONNECT_TYPE = "Invalid QuickConnectType: %s";
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
@@ -79,7 +85,9 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
             throw new CfnThrottlingException(ex);
         } else if (ex instanceof DuplicateResourceException) {
             throw new CfnAlreadyExistsException(ex);
-        } else if (ex instanceof ConnectException && ((ConnectException) ex).awsErrorDetails().errorCode().equals(ACCESS_DENIED_ERROR_CODE)) {
+        } else if (ex instanceof LimitExceededException) {
+            throw new CfnServiceLimitExceededException(ex);
+        } else if (ex instanceof ConnectException && StringUtils.equals(ACCESS_DENIED_ERROR_CODE, ((ConnectException) ex).awsErrorDetails().errorCode())) {
             throw new CfnAccessDeniedException(ex);
         }
         logger.log(String.format("Exception in handler:%s", ex));
@@ -136,7 +144,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
                     .phoneConfig(phoneNumberQuickConnectConfig)
                     .build();
         }
-        throw new CfnInvalidRequestException("Invalid QuickConnectType:" + quickConnectType);
+        throw new CfnInvalidRequestException(String.format(INVALID_QUICK_CONNECT_TYPE, quickConnectType));
     }
 
     protected static Set<Tag> convertResourceTagsToSet(final Map<String, String> resourceTags) {
@@ -150,6 +158,14 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     protected static void requireNotNull(final Object object, final String parameterName) {
         if (object == null) {
             throw new CfnInvalidRequestException(String.format(MISSING_MANDATORY_PARAMETER, parameterName));
+        }
+    }
+
+    protected static String getInstanceIdFromArn(final String arn) {
+        try {
+            return Arn.fromString(arn).resource().resource();
+        } catch (IllegalArgumentException e) {
+            throw new CfnInvalidRequestException(INVALID_QUICK_CONNECT_ARN_EXCEPTION_MESSAGE);
         }
     }
 }

@@ -25,6 +25,12 @@
             <artifactId>connect</artifactId>
             <version>2.16.18</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/arns -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>arns</artifactId>
+            <version>2.16.69</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/software.amazon.cloudformation/aws-cloudformation-rpdk-java-plugin -->
         <dependency>
             <groupId>software.amazon.cloudformation</groupId>

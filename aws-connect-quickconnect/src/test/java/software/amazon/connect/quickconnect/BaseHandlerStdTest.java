@@ -15,6 +15,7 @@ import software.amazon.awssdk.services.connect.model.DuplicateResourceException;
 import software.amazon.awssdk.services.connect.model.InternalServiceException;
 import software.amazon.awssdk.services.connect.model.InvalidParameterException;
 import software.amazon.awssdk.services.connect.model.InvalidRequestException;
+import software.amazon.awssdk.services.connect.model.LimitExceededException;
 import software.amazon.awssdk.services.connect.model.QuickConnectType;
 import software.amazon.awssdk.services.connect.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.connect.model.ThrottlingException;
@@ -24,6 +25,7 @@ import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
+import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
 import software.amazon.cloudformation.exceptions.CfnThrottlingException;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProxyClient;
@@ -37,8 +39,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.CONTACT_FLOW_ID;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.INSTANCE_ID;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.PHONE_NUMBER;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUEUE_ID;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUICK_CONNECT_ARN;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.TAGS_SET_TWO;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.USER_ID;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.VALID_TAG_KEY_ONE;
@@ -56,6 +60,8 @@ public class BaseHandlerStdTest {
     private static final String MISSING_MANDATORY_PARAMETER_EXCEPTION_MESSAGE = "Invalid request provided: Required parameter missing " + PARAMETER_NAME;
     private static final String INVALID_QUICK_CONNECT_TYPE = "InvalidQuickConnectType";
     private static final String ACCESS_DENIED_ERROR_CODE = "AccessDeniedException";
+    private static final String CONNECT_EXCEPTION_ERROR_CODE = "ConnectException";
+    protected static final String INVALID_QUICK_CONNECT_ARN = "invalidArn:111111111111:instance/instanceId/transfer-destination/quickConnect";
 
     @Mock
     private ProxyClient<ConnectClient> proxyClient;
@@ -118,6 +124,25 @@ public class BaseHandlerStdTest {
     @Test
     public void testHandleCommonExceptions_RuntimeException() {
         Exception ex = new RuntimeException();
+        assertThrows(CfnGeneralServiceException.class, () ->
+                BaseHandlerStd.handleCommonExceptions(ex, logger));
+    }
+
+    @Test
+    public void testHandleCommonExceptions_LimitExceededException() {
+        Exception ex = LimitExceededException.builder().build();
+        assertThrows(CfnServiceLimitExceededException.class, () ->
+                BaseHandlerStd.handleCommonExceptions(ex, logger));
+    }
+
+    @Test
+    public void testHandleCommonExceptions_ConnectException() {
+        Exception ex = ConnectException.builder()
+                .awsErrorDetails(AwsErrorDetails.builder()
+                        .errorCode(CONNECT_EXCEPTION_ERROR_CODE)
+                        .build())
+                .statusCode(403)
+                .build();
         assertThrows(CfnGeneralServiceException.class, () ->
                 BaseHandlerStd.handleCommonExceptions(ex, logger));
     }
@@ -207,5 +232,16 @@ public class BaseHandlerStdTest {
                 .build();
         assertThrows(CfnInvalidRequestException.class, () ->
                 BaseHandlerStd.translateToQuickConnectConfig(resourceModel));
+    }
+
+    @Test
+    public void testGetInstanceIdFromValidArn() {
+        assertThat(BaseHandlerStd.getInstanceIdFromArn(QUICK_CONNECT_ARN)).isEqualTo(INSTANCE_ID);
+    }
+
+    @Test
+    public void testGetInstanceIdFromInValidArn() {
+        assertThrows(CfnInvalidRequestException.class, () ->
+                BaseHandlerStd.getInstanceIdFromArn(INVALID_QUICK_CONNECT_ARN));
     }
 }
