@@ -12,7 +12,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 {
     "Type" : "AWS::Connect::QuickConnect",
     "Properties" : {
-        "<a href="#instanceid" title="InstanceId">InstanceId</a>" : <i>String</i>,
+        "<a href="#instancearn" title="InstanceArn">InstanceArn</a>" : <i>String</i>,
         "<a href="#name" title="Name">Name</a>" : <i>String</i>,
         "<a href="#description" title="Description">Description</a>" : <i>String</i>,
         "<a href="#quickconnectconfig" title="QuickConnectConfig">QuickConnectConfig</a>" : <i><a href="quickconnectconfig.md">QuickConnectConfig</a></i>,
@@ -26,7 +26,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 Type: AWS::Connect::QuickConnect
 Properties:
-    <a href="#instanceid" title="InstanceId">InstanceId</a>: <i>String</i>
+    <a href="#instancearn" title="InstanceArn">InstanceArn</a>: <i>String</i>
     <a href="#name" title="Name">Name</a>: <i>String</i>
     <a href="#description" title="Description">Description</a>: <i>String</i>
     <a href="#quickconnectconfig" title="QuickConnectConfig">QuickConnectConfig</a>: <i><a href="quickconnectconfig.md">QuickConnectConfig</a></i>
@@ -36,7 +36,7 @@ Properties:
 
 ## Properties
 
-#### InstanceId
+#### InstanceArn
 
 The identifier of the Amazon Connect instance.
 
@@ -98,7 +98,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 ### Ref
 
-When you pass the logical ID of this resource to the intrinsic `Ref` function, Ref returns the QuickConnectARN.
+When you pass the logical ID of this resource to the intrinsic `Ref` function, Ref returns the QuickConnectArn.
 
 ### Fn::GetAtt
 
@@ -106,10 +106,7 @@ The `Fn::GetAtt` intrinsic function returns a value for a specified attribute of
 
 For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::GetAtt](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-getatt.html).
 
-#### QuickConnectId
-
-The ID of the quick connect
-
-#### QuickConnectARN
+#### QuickConnectArn
 
 The Amazon Resource Name (ARN) for the quick connect.
+

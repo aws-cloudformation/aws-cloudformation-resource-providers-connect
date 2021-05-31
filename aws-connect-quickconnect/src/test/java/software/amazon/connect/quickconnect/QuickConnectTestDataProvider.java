@@ -19,7 +19,7 @@ public class QuickConnectTestDataProvider {
     protected static final String USER_ID_2 = "userId2";
     protected static final String QUEUE_ID_2 = "queueId2";
     protected static final String PHONE_NUMBER_2 = "+9876543210";
-    protected static final String INSTANCE_ID = "instanceId";
+    protected static final String INSTANCE_ARN = "arn:aws:connect:us-west-2:111111111111:instance/instanceId";
     protected static final String QUICK_CONNECT_NAME_ONE = "quickConnectNameOne";
     protected static final String QUICK_CONNECT_DESCRIPTION_ONE = "quickConnectDescriptionOne";
     protected static final String QUICK_CONNECT_NAME_TWO = "quickConnectNameTwo";
@@ -120,9 +120,8 @@ public class QuickConnectTestDataProvider {
                 .build();
 
         return ResourceModel.builder()
-                .quickConnectARN(QUICK_CONNECT_ARN)
-                .quickConnectId(QUICK_CONNECT_ID)
-                .instanceId(INSTANCE_ID)
+                .quickConnectArn(QUICK_CONNECT_ARN)
+                .instanceArn(INSTANCE_ARN)
                 .name(QUICK_CONNECT_NAME_ONE)
                 .description(QUICK_CONNECT_DESCRIPTION_ONE)
                 .quickConnectConfig(quickConnectConfigTypeUser)
@@ -138,9 +137,8 @@ public class QuickConnectTestDataProvider {
                 .build();
 
         return ResourceModel.builder()
-                .quickConnectARN(QUICK_CONNECT_ARN)
-                .quickConnectId(QUICK_CONNECT_ID)
-                .instanceId(INSTANCE_ID)
+                .quickConnectArn(QUICK_CONNECT_ARN)
+                .instanceArn(INSTANCE_ARN)
                 .name(QUICK_CONNECT_NAME_TWO)
                 .description(QUICK_CONNECT_DESCRIPTION_TWO)
                 .quickConnectConfig(quickConnectConfigTypeQueue)
@@ -157,9 +155,8 @@ public class QuickConnectTestDataProvider {
                 .build();
 
         return ResourceModel.builder()
-                .quickConnectARN(QUICK_CONNECT_ARN)
-                .quickConnectId(QUICK_CONNECT_ID)
-                .instanceId(INSTANCE_ID)
+                .quickConnectArn(QUICK_CONNECT_ARN)
+                .instanceArn(INSTANCE_ARN)
                 .name(QUICK_CONNECT_NAME_THREE)
                 .description(QUICK_CONNECT_DESCRIPTION_THREE)
                 .quickConnectConfig(quickConnectConfigTypePhoneNumber)
@@ -170,16 +167,16 @@ public class QuickConnectTestDataProvider {
     protected static UserQuickConnectConfig getUserQuickConnectConfig() {
         return UserQuickConnectConfig
                 .builder()
-                .userId(USER_ID)
-                .contactFlowId(CONTACT_FLOW_ID)
+                .userArn(USER_ID)
+                .contactFlowArn(CONTACT_FLOW_ID)
                 .build();
     }
 
     protected static QueueQuickConnectConfig getQueueQuickConnectConfig() {
         return QueueQuickConnectConfig
                 .builder()
-                .queueId(QUEUE_ID)
-                .contactFlowId(CONTACT_FLOW_ID)
+                .queueArn(QUEUE_ID)
+                .contactFlowArn(CONTACT_FLOW_ID)
                 .build();
     }
 

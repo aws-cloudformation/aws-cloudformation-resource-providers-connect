@@ -16,15 +16,15 @@
       "description": "The phone number in E.164 format.",
       "type": "string"
     },
-    "ContactFlowId": {
+    "ContactFlowArn": {
       "description": "The identifier of the contact flow.",
       "type": "string"
     },
-    "QueueId": {
+    "QueueArn": {
       "description": "The identifier for the queue.",
       "type": "string"
     },
-    "UserId": {
+    "UserArn": {
       "description": "The identifier of the user.",
       "type": "string"
     },
@@ -43,11 +43,11 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "ContactFlowId": {
-          "$ref": "#/definitions/ContactFlowId"
+        "ContactFlowArn": {
+          "$ref": "#/definitions/ContactFlowArn"
         },
-        "QueueId": {
-          "$ref": "#/definitions/QueueId"
+        "QueueArn": {
+          "$ref": "#/definitions/QueueArn"
         }
       }
     },
@@ -56,11 +56,11 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "ContactFlowId": {
-          "$ref": "#/definitions/ContactFlowId"
+        "ContactFlowArn": {
+          "$ref": "#/definitions/ContactFlowArn"
         },
-        "UserId": {
-          "$ref": "#/definitions/UserId"
+        "UserArn": {
+          "$ref": "#/definitions/UserArn"
         }
       }
     },
@@ -111,7 +111,7 @@
     }
   },
   "properties": {
-    "InstanceId": {
+    "InstanceArn": {
       "description": "The identifier of the Amazon Connect instance.",
       "type": "string"
     },
@@ -131,11 +131,7 @@
       "description": "Configuration settings for the quick connect.",
       "$ref": "#/definitions/QuickConnectConfig"
     },
-    "QuickConnectId": {
-      "description": "The ID of the quick connect",
-      "type": "string"
-    },
-    "QuickConnectARN": {
+    "QuickConnectArn": {
       "description": "The Amazon Resource Name (ARN) for the quick connect.",
       "type": "string"
     },
@@ -152,7 +148,7 @@
   },
   "required": [
     "Name",
-    "InstanceId",
+    "InstanceArn",
     "QuickConnectConfig"
   ],
   "handlers": {
@@ -184,15 +180,14 @@
   },
   "additionalProperties": false,
   "primaryIdentifier": [
-    "/properties/QuickConnectARN"
+    "/properties/QuickConnectArn"
   ],
   "additionalIdentifiers": [
     [
-      "/properties/InstanceId"
+      "/properties/InstanceArn"
     ]
   ],
   "readOnlyProperties": [
-    "/properties/QuickConnectId",
-    "/properties/QuickConnectARN"
+    "/properties/QuickConnectArn"
   ]
 }

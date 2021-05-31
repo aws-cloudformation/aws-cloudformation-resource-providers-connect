@@ -10,21 +10,21 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "<a href="#contactflowid" title="ContactFlowId">ContactFlowId</a>" : <i>String</i>,
-    "<a href="#userid" title="UserId">UserId</a>" : <i>String</i>
+    "<a href="#contactflowarn" title="ContactFlowArn">ContactFlowArn</a>" : <i>String</i>,
+    "<a href="#userarn" title="UserArn">UserArn</a>" : <i>String</i>
 }
 </pre>
 
 ### YAML
 
 <pre>
-<a href="#contactflowid" title="ContactFlowId">ContactFlowId</a>: <i>String</i>
-<a href="#userid" title="UserId">UserId</a>: <i>String</i>
+<a href="#contactflowarn" title="ContactFlowArn">ContactFlowArn</a>: <i>String</i>
+<a href="#userarn" title="UserArn">UserArn</a>: <i>String</i>
 </pre>
 
 ## Properties
 
-#### ContactFlowId
+#### ContactFlowArn
 
 The identifier of the contact flow.
 
@@ -34,7 +34,7 @@ _Type_: String
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### UserId
+#### UserArn
 
 The identifier of the user.
 
@@ -43,3 +43,4 @@ _Required_: No
 _Type_: String
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+

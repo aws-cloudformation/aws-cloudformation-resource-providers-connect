@@ -28,7 +28,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.INSTANCE_ID;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.INSTANCE_ARN;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUICK_CONNECT_ARN;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.TAGS_ONE;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.buildQuickConnectResourceModelWithQuickConnectTypeQueue;
@@ -84,7 +84,7 @@ public class DeleteHandlerTest {
         assertThat(response.getErrorCode()).isNull();
 
         verify(proxyClient.client()).deleteQuickConnect(deleteQuickConnectRequestArgumentCaptor.capture());
-        assertThat(deleteQuickConnectRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(deleteQuickConnectRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(deleteQuickConnectRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
     }
 
@@ -103,7 +103,7 @@ public class DeleteHandlerTest {
                 handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
 
         verify(proxyClient.client()).deleteQuickConnect(deleteQuickConnectRequestArgumentCaptor.capture());
-        assertThat(deleteQuickConnectRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(deleteQuickConnectRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(deleteQuickConnectRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
     }
 }

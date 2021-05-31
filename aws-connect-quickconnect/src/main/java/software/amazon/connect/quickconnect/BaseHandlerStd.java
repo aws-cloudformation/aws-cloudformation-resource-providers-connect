@@ -111,11 +111,11 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
         final String quickConnectType = model.getQuickConnectConfig().getQuickConnectType();
         if (quickConnectType.equals(QuickConnectType.USER.toString())) {
             requireNotNull(model.getQuickConnectConfig().getUserConfig(), QUICK_CONNECT_USER_CONFIG);
-            requireNotNull(model.getQuickConnectConfig().getUserConfig().getUserId(), USER_ID);
-            requireNotNull(model.getQuickConnectConfig().getUserConfig().getContactFlowId(), CONTACT_FLOW_ID);
+            requireNotNull(model.getQuickConnectConfig().getUserConfig().getUserArn(), USER_ID);
+            requireNotNull(model.getQuickConnectConfig().getUserConfig().getContactFlowArn(), CONTACT_FLOW_ID);
             final software.amazon.awssdk.services.connect.model.UserQuickConnectConfig userQuickConnectConfig = UserQuickConnectConfig.builder()
-                    .userId(model.getQuickConnectConfig().getUserConfig().getUserId())
-                    .contactFlowId(model.getQuickConnectConfig().getUserConfig().getContactFlowId())
+                    .userId(model.getQuickConnectConfig().getUserConfig().getUserArn())
+                    .contactFlowId(model.getQuickConnectConfig().getUserConfig().getContactFlowArn())
                     .build();
             return software.amazon.awssdk.services.connect.model.QuickConnectConfig.builder()
                     .quickConnectType(quickConnectType)
@@ -123,11 +123,11 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
                     .build();
         } else if (quickConnectType.equals(QuickConnectType.QUEUE.toString())) {
             requireNotNull(model.getQuickConnectConfig().getQueueConfig(), QUICK_CONNECT_QUEUE_CONFIG);
-            requireNotNull(model.getQuickConnectConfig().getQueueConfig().getQueueId(), QUEUE_ID);
-            requireNotNull(model.getQuickConnectConfig().getQueueConfig().getContactFlowId(), CONTACT_FLOW_ID);
+            requireNotNull(model.getQuickConnectConfig().getQueueConfig().getQueueArn(), QUEUE_ID);
+            requireNotNull(model.getQuickConnectConfig().getQueueConfig().getContactFlowArn(), CONTACT_FLOW_ID);
             final software.amazon.awssdk.services.connect.model.QueueQuickConnectConfig queueQuickConnectConfig = QueueQuickConnectConfig.builder()
-                    .queueId(model.getQuickConnectConfig().getQueueConfig().getQueueId())
-                    .contactFlowId(model.getQuickConnectConfig().getQueueConfig().getContactFlowId())
+                    .queueId(model.getQuickConnectConfig().getQueueConfig().getQueueArn())
+                    .contactFlowId(model.getQuickConnectConfig().getQueueConfig().getContactFlowArn())
                     .build();
             return software.amazon.awssdk.services.connect.model.QuickConnectConfig.builder()
                     .quickConnectType(quickConnectType)
@@ -161,11 +161,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
         }
     }
 
-    protected static String getInstanceIdFromArn(final String arn) {
-        try {
-            return Arn.fromString(arn).resource().resource();
-        } catch (IllegalArgumentException e) {
-            throw new CfnInvalidRequestException(INVALID_QUICK_CONNECT_ARN_EXCEPTION_MESSAGE);
-        }
+    protected static String getInstanceArnFromQuickConnectArn(final String quickConnectArn) {
+        return quickConnectArn.substring(0, quickConnectArn.indexOf("transfer-destination")-1);
     }
 }

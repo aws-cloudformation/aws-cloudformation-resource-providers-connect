@@ -19,7 +19,7 @@ public class DeleteHandler extends BaseHandlerStd {
             final Logger logger) {
 
         final ResourceModel model = request.getDesiredResourceState();
-        final String quickConnectArn = model.getQuickConnectARN();
+        final String quickConnectArn = model.getQuickConnectArn();
 
         logger.log(String.format("Invoked DeleteQuickConnectHandler with QuickConnect:%s", quickConnectArn));
 
@@ -32,8 +32,8 @@ public class DeleteHandler extends BaseHandlerStd {
     private DeleteQuickConnectRequest translateToDeleteQuickConnectRequest(final ResourceModel model) {
         return DeleteQuickConnectRequest
                 .builder()
-                .instanceId(getInstanceIdFromArn(model.getQuickConnectARN()))
-                .quickConnectId(model.getQuickConnectARN())
+                .instanceId(getInstanceArnFromQuickConnectArn(model.getQuickConnectArn()))
+                .quickConnectId(model.getQuickConnectArn())
                 .build();
     }
 }

@@ -38,20 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.CONTACT_FLOW_ID;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.INSTANCE_ID;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.PHONE_NUMBER;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUEUE_ID;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUICK_CONNECT_ARN;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.TAGS_SET_TWO;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.USER_ID;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.VALID_TAG_KEY_ONE;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.VALID_TAG_KEY_TWO;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.VALID_TAG_VALUE_ONE;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.VALID_TAG_VALUE_TWO;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.buildQuickConnectResourceModelWithQuickConnectTypePhoneNumber;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.buildQuickConnectResourceModelWithQuickConnectTypeQueue;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.buildQuickConnectResourceModelWithQuickConnectTypeUser;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.*;
 
 @ExtendWith(MockitoExtension.class)
 public class BaseHandlerStdTest {
@@ -61,7 +48,6 @@ public class BaseHandlerStdTest {
     private static final String INVALID_QUICK_CONNECT_TYPE = "InvalidQuickConnectType";
     private static final String ACCESS_DENIED_ERROR_CODE = "AccessDeniedException";
     private static final String CONNECT_EXCEPTION_ERROR_CODE = "ConnectException";
-    protected static final String INVALID_QUICK_CONNECT_ARN = "invalidArn:111111111111:instance/instanceId/transfer-destination/quickConnect";
 
     @Mock
     private ProxyClient<ConnectClient> proxyClient;
@@ -235,13 +221,7 @@ public class BaseHandlerStdTest {
     }
 
     @Test
-    public void testGetInstanceIdFromValidArn() {
-        assertThat(BaseHandlerStd.getInstanceIdFromArn(QUICK_CONNECT_ARN)).isEqualTo(INSTANCE_ID);
-    }
-
-    @Test
-    public void testGetInstanceIdFromInValidArn() {
-        assertThrows(CfnInvalidRequestException.class, () ->
-                BaseHandlerStd.getInstanceIdFromArn(INVALID_QUICK_CONNECT_ARN));
+    public void testGetInstanceArnFromQuickConnectArn() {
+        assertThat(BaseHandlerStd.getInstanceArnFromQuickConnectArn(QUICK_CONNECT_ARN)).isEqualTo(INSTANCE_ARN);
     }
 }

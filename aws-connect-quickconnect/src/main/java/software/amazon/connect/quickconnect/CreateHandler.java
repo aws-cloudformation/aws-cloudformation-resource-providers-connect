@@ -25,7 +25,7 @@ public class CreateHandler extends BaseHandlerStd {
         final Map<String, String> tags = request.getDesiredResourceTags();
 
         logger.log(String.format("Invoked CreateQuickConnectHandler with InstanceId:%s ,QuickConnectName:%s, " +
-                "QuickConnectType:%s", model.getInstanceId(), model.getName(), model.getQuickConnectConfig().getQuickConnectType()));
+                "QuickConnectType:%s", model.getInstanceArn(), model.getName(), model.getQuickConnectConfig().getQuickConnectType()));
 
         return proxy.initiate("connect::createQuickConnect", proxyClient, model, callbackContext)
                 .translateToServiceRequest(resourceModel -> translateToCreateQuickConnectRequest(resourceModel, tags))
@@ -36,7 +36,7 @@ public class CreateHandler extends BaseHandlerStd {
     private CreateQuickConnectRequest translateToCreateQuickConnectRequest(final ResourceModel model, final Map<String, String> tags) {
         return CreateQuickConnectRequest
                 .builder()
-                .instanceId(model.getInstanceId())
+                .instanceId(model.getInstanceArn())
                 .name(model.getName())
                 .description(model.getDescription())
                 .tags(tags)
@@ -45,8 +45,7 @@ public class CreateHandler extends BaseHandlerStd {
     }
 
     private ResourceModel setQuickConnectIdentifiers(final ResourceModel model, final CreateQuickConnectResponse createQuickConnectResponse) {
-        model.setQuickConnectARN(createQuickConnectResponse.quickConnectARN());
-        model.setQuickConnectId(createQuickConnectResponse.quickConnectId());
+        model.setQuickConnectArn(createQuickConnectResponse.quickConnectARN());
         return model;
     }
 }

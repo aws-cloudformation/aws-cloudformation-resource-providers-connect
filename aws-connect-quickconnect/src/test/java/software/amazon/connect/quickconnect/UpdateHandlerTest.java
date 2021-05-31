@@ -41,7 +41,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.CONTACT_FLOW_ID;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.CONTACT_FLOW_ID_2;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.INSTANCE_ID;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.INSTANCE_ARN;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.PHONE_NUMBER;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.PHONE_NUMBER_2;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUEUE_ID;
@@ -50,7 +50,6 @@ import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUICK_CONNECT_DESCRIPTION_ONE;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUICK_CONNECT_DESCRIPTION_THREE;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUICK_CONNECT_DESCRIPTION_TWO;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUICK_CONNECT_ID;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUICK_CONNECT_NAME_ONE;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUICK_CONNECT_NAME_THREE;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUICK_CONNECT_NAME_TWO;
@@ -140,13 +139,13 @@ public class UpdateHandlerTest {
         assertThat(response.getErrorCode()).isNull();
 
         verify(proxyClient.client()).updateQuickConnectName(updateQuickConnectNameRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().name()).isEqualTo(QUICK_CONNECT_NAME_ONE);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().description()).isEqualTo(QUICK_CONNECT_DESCRIPTION_ONE);
 
         verify(proxyClient.client()).updateQuickConnectConfig(updateQuickConnectConfigRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig()).isNotNull();
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig().contactFlowId()).isEqualTo(CONTACT_FLOW_ID);
@@ -203,13 +202,13 @@ public class UpdateHandlerTest {
         assertThat(response.getErrorCode()).isNull();
 
         verify(proxyClient.client()).updateQuickConnectName(updateQuickConnectNameRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().name()).isEqualTo(QUICK_CONNECT_NAME_THREE);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().description()).isEqualTo(QUICK_CONNECT_DESCRIPTION_THREE);
 
         verify(proxyClient.client()).updateQuickConnectConfig(updateQuickConnectConfigRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig()).isNull();
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().queueConfig()).isNull();
@@ -265,13 +264,13 @@ public class UpdateHandlerTest {
         assertThat(response.getErrorCode()).isNull();
 
         verify(proxyClient.client()).updateQuickConnectName(updateQuickConnectNameRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().name()).isEqualTo(QUICK_CONNECT_NAME_TWO);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().description()).isEqualTo(QUICK_CONNECT_DESCRIPTION_TWO);
 
         verify(proxyClient.client()).updateQuickConnectConfig(updateQuickConnectConfigRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig()).isNull();
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().queueConfig()).isNotNull();
@@ -328,13 +327,13 @@ public class UpdateHandlerTest {
         assertThat(response.getErrorCode()).isNull();
 
         verify(proxyClient.client()).updateQuickConnectName(updateQuickConnectNameRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().name()).isEqualTo(QUICK_CONNECT_NAME_THREE);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().description()).isEqualTo(QUICK_CONNECT_DESCRIPTION_THREE);
 
         verify(proxyClient.client()).updateQuickConnectConfig(updateQuickConnectConfigRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig()).isNull();
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().queueConfig()).isNull();
@@ -390,13 +389,13 @@ public class UpdateHandlerTest {
         assertThat(response.getErrorCode()).isNull();
 
         verify(proxyClient.client()).updateQuickConnectName(updateQuickConnectNameRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().name()).isEqualTo(QUICK_CONNECT_NAME_TWO);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().description()).isEqualTo(QUICK_CONNECT_DESCRIPTION_TWO);
 
         verify(proxyClient.client()).updateQuickConnectConfig(updateQuickConnectConfigRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig()).isNull();
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().queueConfig()).isNotNull();
@@ -453,13 +452,13 @@ public class UpdateHandlerTest {
         assertThat(response.getErrorCode()).isNull();
 
         verify(proxyClient.client()).updateQuickConnectName(updateQuickConnectNameRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().name()).isEqualTo(QUICK_CONNECT_NAME_ONE);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().description()).isEqualTo(QUICK_CONNECT_DESCRIPTION_ONE);
 
         verify(proxyClient.client()).updateQuickConnectConfig(updateQuickConnectConfigRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig()).isNotNull();
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig().contactFlowId()).isEqualTo(CONTACT_FLOW_ID);
@@ -486,9 +485,8 @@ public class UpdateHandlerTest {
                 .build();
 
         final ResourceModel desiredResourceModel = ResourceModel.builder()
-                .quickConnectARN(QUICK_CONNECT_ARN)
-                .quickConnectId(QUICK_CONNECT_ID)
-                .instanceId(INSTANCE_ID)
+                .quickConnectArn(QUICK_CONNECT_ARN)
+                .instanceArn(INSTANCE_ARN)
                 .name(QUICK_CONNECT_NAME_TWO)
                 .description(QUICK_CONNECT_DESCRIPTION_THREE)
                 .quickConnectConfig(quickConnectConfigTypePhoneNumber)
@@ -519,7 +517,7 @@ public class UpdateHandlerTest {
         assertThat(response.getErrorCode()).isNull();
 
         verify(proxyClient.client()).updateQuickConnectName(updateQuickConnectNameRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().name()).isEqualTo(QUICK_CONNECT_NAME_TWO);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().description()).isEqualTo(QUICK_CONNECT_DESCRIPTION_THREE);
@@ -535,9 +533,8 @@ public class UpdateHandlerTest {
                 .build();
 
         final ResourceModel desiredResourceModel = ResourceModel.builder()
-                .quickConnectARN(QUICK_CONNECT_ARN)
-                .quickConnectId(QUICK_CONNECT_ID)
-                .instanceId(INSTANCE_ID)
+                .quickConnectArn(QUICK_CONNECT_ARN)
+                .instanceArn(INSTANCE_ARN)
                 .name(QUICK_CONNECT_NAME_THREE)
                 .description(QUICK_CONNECT_DESCRIPTION_TWO)
                 .quickConnectConfig(quickConnectConfigTypePhoneNumber)
@@ -568,7 +565,7 @@ public class UpdateHandlerTest {
         assertThat(response.getErrorCode()).isNull();
 
         verify(proxyClient.client()).updateQuickConnectName(updateQuickConnectNameRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().name()).isEqualTo(QUICK_CONNECT_NAME_THREE);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().description()).isEqualTo(QUICK_CONNECT_DESCRIPTION_TWO);
@@ -582,15 +579,14 @@ public class UpdateHandlerTest {
                 .quickConnectType(QuickConnectType.USER.toString())
                 .userConfig(UserQuickConnectConfig
                         .builder()
-                        .userId(USER_ID_2)
-                        .contactFlowId(CONTACT_FLOW_ID)
+                        .userArn(USER_ID_2)
+                        .contactFlowArn(CONTACT_FLOW_ID)
                         .build())
                 .build();
 
         final ResourceModel desiredResourceModel = ResourceModel.builder()
-                .quickConnectARN(QUICK_CONNECT_ARN)
-                .quickConnectId(QUICK_CONNECT_ID)
-                .instanceId(INSTANCE_ID)
+                .quickConnectArn(QUICK_CONNECT_ARN)
+                .instanceArn(INSTANCE_ARN)
                 .name(QUICK_CONNECT_NAME_ONE)
                 .description(QUICK_CONNECT_DESCRIPTION_ONE)
                 .quickConnectConfig(quickConnectConfigTypeUser)
@@ -621,7 +617,7 @@ public class UpdateHandlerTest {
         assertThat(response.getErrorCode()).isNull();
 
         verify(proxyClient.client()).updateQuickConnectConfig(updateQuickConnectConfigRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig()).isNotNull();
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig().contactFlowId()).isEqualTo(CONTACT_FLOW_ID);
@@ -638,15 +634,14 @@ public class UpdateHandlerTest {
                 .quickConnectType(QuickConnectType.USER.toString())
                 .userConfig(UserQuickConnectConfig
                         .builder()
-                        .userId(USER_ID)
-                        .contactFlowId(CONTACT_FLOW_ID_2)
+                        .userArn(USER_ID)
+                        .contactFlowArn(CONTACT_FLOW_ID_2)
                         .build())
                 .build();
 
         final ResourceModel desiredResourceModel = ResourceModel.builder()
-                .quickConnectARN(QUICK_CONNECT_ARN)
-                .quickConnectId(QUICK_CONNECT_ID)
-                .instanceId(INSTANCE_ID)
+                .quickConnectArn(QUICK_CONNECT_ARN)
+                .instanceArn(INSTANCE_ARN)
                 .name(QUICK_CONNECT_NAME_ONE)
                 .description(QUICK_CONNECT_DESCRIPTION_ONE)
                 .quickConnectConfig(quickConnectConfigTypeUser)
@@ -677,7 +672,7 @@ public class UpdateHandlerTest {
         assertThat(response.getErrorCode()).isNull();
 
         verify(proxyClient.client()).updateQuickConnectConfig(updateQuickConnectConfigRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig()).isNotNull();
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig().contactFlowId()).isEqualTo(CONTACT_FLOW_ID_2);
@@ -693,15 +688,14 @@ public class UpdateHandlerTest {
                 .quickConnectType(QuickConnectType.QUEUE.toString())
                 .queueConfig(QueueQuickConnectConfig
                         .builder()
-                        .queueId(QUEUE_ID_2)
-                        .contactFlowId(CONTACT_FLOW_ID)
+                        .queueArn(QUEUE_ID_2)
+                        .contactFlowArn(CONTACT_FLOW_ID)
                         .build())
                 .build();
 
         final ResourceModel desiredResourceModel = ResourceModel.builder()
-                .quickConnectARN(QUICK_CONNECT_ARN)
-                .quickConnectId(QUICK_CONNECT_ID)
-                .instanceId(INSTANCE_ID)
+                .quickConnectArn(QUICK_CONNECT_ARN)
+                .instanceArn(INSTANCE_ARN)
                 .name(QUICK_CONNECT_NAME_TWO)
                 .description(QUICK_CONNECT_DESCRIPTION_TWO)
                 .quickConnectConfig(quickConnectConfigTypeQueue)
@@ -732,7 +726,7 @@ public class UpdateHandlerTest {
         assertThat(response.getErrorCode()).isNull();
 
         verify(proxyClient.client()).updateQuickConnectConfig(updateQuickConnectConfigRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig()).isNull();
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().queueConfig()).isNotNull();
@@ -748,15 +742,14 @@ public class UpdateHandlerTest {
                 .quickConnectType(QuickConnectType.QUEUE.toString())
                 .queueConfig(QueueQuickConnectConfig
                         .builder()
-                        .queueId(QUEUE_ID)
-                        .contactFlowId(CONTACT_FLOW_ID_2)
+                        .queueArn(QUEUE_ID)
+                        .contactFlowArn(CONTACT_FLOW_ID_2)
                         .build())
                 .build();
 
         final ResourceModel desiredResourceModel = ResourceModel.builder()
-                .quickConnectARN(QUICK_CONNECT_ARN)
-                .quickConnectId(QUICK_CONNECT_ID)
-                .instanceId(INSTANCE_ID)
+                .quickConnectArn(QUICK_CONNECT_ARN)
+                .instanceArn(INSTANCE_ARN)
                 .name(QUICK_CONNECT_NAME_TWO)
                 .description(QUICK_CONNECT_DESCRIPTION_TWO)
                 .quickConnectConfig(quickConnectConfigTypeQueue)
@@ -787,7 +780,7 @@ public class UpdateHandlerTest {
         assertThat(response.getErrorCode()).isNull();
 
         verify(proxyClient.client()).updateQuickConnectConfig(updateQuickConnectConfigRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig()).isNull();
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().queueConfig()).isNotNull();
@@ -808,9 +801,8 @@ public class UpdateHandlerTest {
                 .build();
 
         final ResourceModel desiredResourceModel = ResourceModel.builder()
-                .quickConnectARN(QUICK_CONNECT_ARN)
-                .quickConnectId(QUICK_CONNECT_ID)
-                .instanceId(INSTANCE_ID)
+                .quickConnectArn(QUICK_CONNECT_ARN)
+                .instanceArn(INSTANCE_ARN)
                 .name(QUICK_CONNECT_NAME_THREE)
                 .description(QUICK_CONNECT_DESCRIPTION_THREE)
                 .quickConnectConfig(quickConnectConfigTypePhoneNumber)
@@ -841,7 +833,7 @@ public class UpdateHandlerTest {
         assertThat(response.getErrorCode()).isNull();
 
         verify(proxyClient.client()).updateQuickConnectConfig(updateQuickConnectConfigRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig()).isNull();
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().queueConfig()).isNull();
@@ -859,9 +851,8 @@ public class UpdateHandlerTest {
                 .build();
 
         final ResourceModel desiredResourceModel = ResourceModel.builder()
-                .quickConnectARN(QUICK_CONNECT_ARN)
-                .quickConnectId(QUICK_CONNECT_ID)
-                .instanceId(INSTANCE_ID)
+                .quickConnectArn(QUICK_CONNECT_ARN)
+                .instanceArn(INSTANCE_ARN)
                 .name(QUICK_CONNECT_NAME_TWO)
                 .description(QUICK_CONNECT_DESCRIPTION_THREE)
                 .quickConnectConfig(quickConnectConfigTypePhoneNumber)
@@ -882,7 +873,7 @@ public class UpdateHandlerTest {
         assertThrows(CfnGeneralServiceException.class, () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
 
         verify(proxyClient.client()).updateQuickConnectName(updateQuickConnectNameRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().name()).isEqualTo(QUICK_CONNECT_NAME_TWO);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().description()).isEqualTo(QUICK_CONNECT_DESCRIPTION_THREE);
@@ -908,13 +899,13 @@ public class UpdateHandlerTest {
         assertThrows(CfnGeneralServiceException.class, () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
 
         verify(proxyClient.client()).updateQuickConnectName(updateQuickConnectNameRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().name()).isEqualTo(QUICK_CONNECT_NAME_ONE);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().description()).isEqualTo(QUICK_CONNECT_DESCRIPTION_ONE);
 
         verify(proxyClient.client()).updateQuickConnectConfig(updateQuickConnectConfigRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig()).isNotNull();
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig().contactFlowId()).isEqualTo(CONTACT_FLOW_ID);
@@ -949,13 +940,13 @@ public class UpdateHandlerTest {
         assertThrows(CfnGeneralServiceException.class, () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
 
         verify(proxyClient.client()).updateQuickConnectName(updateQuickConnectNameRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().name()).isEqualTo(QUICK_CONNECT_NAME_ONE);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().description()).isEqualTo(QUICK_CONNECT_DESCRIPTION_ONE);
 
         verify(proxyClient.client()).updateQuickConnectConfig(updateQuickConnectConfigRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig()).isNotNull();
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig().contactFlowId()).isEqualTo(CONTACT_FLOW_ID);
@@ -993,13 +984,13 @@ public class UpdateHandlerTest {
         assertThrows(CfnGeneralServiceException.class, () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
 
         verify(proxyClient.client()).updateQuickConnectName(updateQuickConnectNameRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().name()).isEqualTo(QUICK_CONNECT_NAME_ONE);
         assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().description()).isEqualTo(QUICK_CONNECT_DESCRIPTION_ONE);
 
         verify(proxyClient.client()).updateQuickConnectConfig(updateQuickConnectConfigRequestArgumentCaptor.capture());
-        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig()).isNotNull();
         assertThat(updateQuickConnectConfigRequestArgumentCaptor.getValue().quickConnectConfig().userConfig().contactFlowId()).isEqualTo(CONTACT_FLOW_ID);

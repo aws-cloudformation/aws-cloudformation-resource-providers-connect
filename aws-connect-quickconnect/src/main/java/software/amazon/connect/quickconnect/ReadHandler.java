@@ -21,7 +21,7 @@ public class ReadHandler extends BaseHandlerStd {
             final Logger logger) {
 
         final ResourceModel model = request.getDesiredResourceState();
-        final String quickConnectArn = model.getQuickConnectARN();
+        final String quickConnectArn = model.getQuickConnectArn();
 
         logger.log(String.format("Invoked ReadQuickConnectHandler with QuickConnect:%s", quickConnectArn));
 
@@ -34,28 +34,28 @@ public class ReadHandler extends BaseHandlerStd {
     private DescribeQuickConnectRequest translateToDescribeQuickConnectRequest(final ResourceModel model) {
         return DescribeQuickConnectRequest
                 .builder()
-                .instanceId(getInstanceIdFromArn(model.getQuickConnectARN()))
-                .quickConnectId(model.getQuickConnectARN())
+                .instanceId(getInstanceArnFromQuickConnectArn(model.getQuickConnectArn()))
+                .quickConnectId(model.getQuickConnectArn())
                 .build();
     }
 
     private software.amazon.connect.quickconnect.QuickConnectConfig translateToResourceModelQuickConnectConfig
-            (final software.amazon.awssdk.services.connect.model.QuickConnectConfig quickConnectConfig) {
+            (final String instanceArn, final software.amazon.awssdk.services.connect.model.QuickConnectConfig quickConnectConfig) {
         final String quickConnectType = quickConnectConfig.quickConnectType().toString();
         final software.amazon.connect.quickconnect.QuickConnectConfig resourceModelQuickConnectConfig = new software.amazon.connect.quickconnect.QuickConnectConfig();
         resourceModelQuickConnectConfig.setQuickConnectType(quickConnectType);
 
         if (quickConnectType.equals(QuickConnectType.USER.toString())) {
             final software.amazon.connect.quickconnect.UserQuickConnectConfig userQuickConnectConfig = new software.amazon.connect.quickconnect.UserQuickConnectConfig();
-            userQuickConnectConfig.setUserId(quickConnectConfig.userConfig().userId());
-            userQuickConnectConfig.setContactFlowId(quickConnectConfig.userConfig().contactFlowId());
+            userQuickConnectConfig.setUserArn(instanceArn + "/agent/" + quickConnectConfig.userConfig().userId());
+            userQuickConnectConfig.setContactFlowArn(instanceArn + "/contact-flow/" + quickConnectConfig.userConfig().contactFlowId());
             resourceModelQuickConnectConfig.setUserConfig(userQuickConnectConfig);
         }
 
         if (quickConnectType.equals(QuickConnectType.QUEUE.toString())) {
             final software.amazon.connect.quickconnect.QueueQuickConnectConfig queueQuickConnectConfig = new software.amazon.connect.quickconnect.QueueQuickConnectConfig();
-            queueQuickConnectConfig.setQueueId(quickConnectConfig.queueConfig().queueId());
-            queueQuickConnectConfig.setContactFlowId(quickConnectConfig.queueConfig().contactFlowId());
+            queueQuickConnectConfig.setQueueArn(instanceArn + "/queue/" + quickConnectConfig.queueConfig().queueId());
+            queueQuickConnectConfig.setContactFlowArn(instanceArn + "/contact-flow/" + quickConnectConfig.queueConfig().contactFlowId());
             resourceModelQuickConnectConfig.setQueueConfig(queueQuickConnectConfig);
         }
 
@@ -68,11 +68,11 @@ public class ReadHandler extends BaseHandlerStd {
     }
 
     private ResourceModel setQuickConnectProperties(final ResourceModel model, final QuickConnect quickConnect) {
-        model.setInstanceId(getInstanceIdFromArn(quickConnect.quickConnectARN()));
-        model.setQuickConnectId(quickConnect.quickConnectId());
+        final String instanceArn = getInstanceArnFromQuickConnectArn(quickConnect.quickConnectARN());
+        model.setInstanceArn(instanceArn);
         model.setName(quickConnect.name());
         model.setDescription(quickConnect.description());
-        model.setQuickConnectConfig(translateToResourceModelQuickConnectConfig(quickConnect.quickConnectConfig()));
+        model.setQuickConnectConfig(translateToResourceModelQuickConnectConfig(instanceArn, quickConnect.quickConnectConfig()));
         model.setTags(convertResourceTagsToSet(quickConnect.tags()));
         return model;
     }
