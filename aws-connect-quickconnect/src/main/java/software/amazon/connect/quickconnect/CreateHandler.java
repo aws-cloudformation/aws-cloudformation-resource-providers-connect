@@ -30,7 +30,7 @@ public class CreateHandler extends BaseHandlerStd {
         return proxy.initiate("connect::createQuickConnect", proxyClient, model, callbackContext)
                 .translateToServiceRequest(resourceModel -> translateToCreateQuickConnectRequest(resourceModel, tags))
                 .makeServiceCall((req, clientProxy) -> invoke(req, clientProxy, clientProxy.client()::createQuickConnect, logger))
-                .done(response -> ProgressEvent.defaultSuccessHandler(setQuickConnectIdentifiers(model, response)));
+                .done(response -> ProgressEvent.defaultSuccessHandler(setQuickConnectIdentifier(model, response)));
     }
 
     private CreateQuickConnectRequest translateToCreateQuickConnectRequest(final ResourceModel model, final Map<String, String> tags) {
@@ -44,7 +44,7 @@ public class CreateHandler extends BaseHandlerStd {
                 .build();
     }
 
-    private ResourceModel setQuickConnectIdentifiers(final ResourceModel model, final CreateQuickConnectResponse createQuickConnectResponse) {
+    private ResourceModel setQuickConnectIdentifier(final ResourceModel model, final CreateQuickConnectResponse createQuickConnectResponse) {
         model.setQuickConnectArn(createQuickConnectResponse.quickConnectARN());
         return model;
     }

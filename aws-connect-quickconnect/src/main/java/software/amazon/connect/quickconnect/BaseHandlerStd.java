@@ -2,7 +2,6 @@ package software.amazon.connect.quickconnect;
 
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
-import software.amazon.awssdk.arns.Arn;
 import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.awscore.AwsResponse;
 import software.amazon.awssdk.services.connect.ConnectClient;
@@ -50,8 +49,8 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     private static final String CONTACT_FLOW_ID = "ContactFlowId";
     private static final String PHONE_NUMBER = "PhoneNumber";
     private static final String ACCESS_DENIED_ERROR_CODE = "AccessDeniedException";
-    private static final String INVALID_QUICK_CONNECT_ARN_EXCEPTION_MESSAGE = "QuickConnect Arn is invalid";
     private static final String INVALID_QUICK_CONNECT_TYPE = "Invalid QuickConnectType: %s";
+    private static final String TRANSFER_DESTINATION = "transfer-destination";
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
@@ -162,6 +161,6 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     }
 
     protected static String getInstanceArnFromQuickConnectArn(final String quickConnectArn) {
-        return quickConnectArn.substring(0, quickConnectArn.indexOf("transfer-destination")-1);
+        return quickConnectArn.substring(0, quickConnectArn.indexOf(TRANSFER_DESTINATION) - 1);
     }
 }

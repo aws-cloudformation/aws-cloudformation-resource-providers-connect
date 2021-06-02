@@ -12,6 +12,11 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 public class ReadHandler extends BaseHandlerStd {
 
+    private static final String USER_ARN_FORMAT = "%s/agent/%s";
+    private static final String CONTACT_FLOW_ARN_FORMAT = "%s/contact-flow/%s";
+    private static final String QUEUE_ARN_FORMAT = "%s/queue/%s";
+
+
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
             final AmazonWebServicesClientProxy proxy,
@@ -47,15 +52,16 @@ public class ReadHandler extends BaseHandlerStd {
 
         if (quickConnectType.equals(QuickConnectType.USER.toString())) {
             final software.amazon.connect.quickconnect.UserQuickConnectConfig userQuickConnectConfig = new software.amazon.connect.quickconnect.UserQuickConnectConfig();
-            userQuickConnectConfig.setUserArn(instanceArn + "/agent/" + quickConnectConfig.userConfig().userId());
-            userQuickConnectConfig.setContactFlowArn(instanceArn + "/contact-flow/" + quickConnectConfig.userConfig().contactFlowId());
+            userQuickConnectConfig.setUserArn(String.format(USER_ARN_FORMAT, instanceArn, quickConnectConfig.userConfig().userId()));
+            userQuickConnectConfig.setContactFlowArn(String.format(CONTACT_FLOW_ARN_FORMAT, instanceArn, quickConnectConfig.userConfig().contactFlowId()));
             resourceModelQuickConnectConfig.setUserConfig(userQuickConnectConfig);
         }
 
         if (quickConnectType.equals(QuickConnectType.QUEUE.toString())) {
             final software.amazon.connect.quickconnect.QueueQuickConnectConfig queueQuickConnectConfig = new software.amazon.connect.quickconnect.QueueQuickConnectConfig();
-            queueQuickConnectConfig.setQueueArn(instanceArn + "/queue/" + quickConnectConfig.queueConfig().queueId());
-            queueQuickConnectConfig.setContactFlowArn(instanceArn + "/contact-flow/" + quickConnectConfig.queueConfig().contactFlowId());
+            queueQuickConnectConfig.setQueueArn(String.format(QUEUE_ARN_FORMAT, instanceArn, quickConnectConfig.queueConfig().queueId()));
+            queueQuickConnectConfig.setContactFlowArn(String.format(CONTACT_FLOW_ARN_FORMAT, instanceArn, quickConnectConfig.queueConfig().contactFlowId()));
+
             resourceModelQuickConnectConfig.setQueueConfig(queueQuickConnectConfig);
         }
 

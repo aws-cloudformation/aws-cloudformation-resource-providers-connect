@@ -38,7 +38,20 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.*;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.CONTACT_FLOW_ID;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.INSTANCE_ARN;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.PHONE_NUMBER;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUEUE_ID;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUICK_CONNECT_ARN;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.TAGS_SET_TWO;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.USER_ID;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.VALID_TAG_KEY_ONE;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.VALID_TAG_KEY_TWO;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.VALID_TAG_VALUE_ONE;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.VALID_TAG_VALUE_TWO;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.buildQuickConnectResourceModelWithQuickConnectTypePhoneNumber;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.buildQuickConnectResourceModelWithQuickConnectTypeQueue;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.buildQuickConnectResourceModelWithQuickConnectTypeUser;
 
 @ExtendWith(MockitoExtension.class)
 public class BaseHandlerStdTest {
