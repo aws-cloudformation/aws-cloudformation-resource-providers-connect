@@ -76,7 +76,7 @@ public class UpdateHandler extends BaseHandlerStd {
     private static UpdateQuickConnectNameRequest translateToUpdateQuickConnectNameRequest(final ResourceModel model) {
         return UpdateQuickConnectNameRequest
                 .builder()
-                .instanceId(getInstanceArnFromQuickConnectArn(model.getQuickConnectArn()))
+                .instanceId(model.getInstanceArn())
                 .quickConnectId(model.getQuickConnectArn())
                 .name(model.getName())
                 .description(model.getDescription())
@@ -86,7 +86,7 @@ public class UpdateHandler extends BaseHandlerStd {
     private static UpdateQuickConnectConfigRequest translateToUpdateQuickConnectConfigRequest(final ResourceModel model) {
         return UpdateQuickConnectConfigRequest
                 .builder()
-                .instanceId(getInstanceArnFromQuickConnectArn(model.getQuickConnectArn()))
+                .instanceId(model.getInstanceArn())
                 .quickConnectId(model.getQuickConnectArn())
                 .quickConnectConfig(translateToQuickConnectConfig(model))
                 .build();
