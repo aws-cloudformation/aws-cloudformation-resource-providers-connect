@@ -187,11 +187,6 @@
   "primaryIdentifier": [
     "/properties/QuickConnectArn"
   ],
-  "additionalIdentifiers": [
-    [
-      "/properties/InstanceArn"
-    ]
-  ],
   "readOnlyProperties": [
     "/properties/QuickConnectArn"
   ]

@@ -8,11 +8,9 @@ import software.amazon.awssdk.services.connect.model.TagResourceRequest;
 import software.amazon.awssdk.services.connect.model.UntagResourceRequest;
 import software.amazon.awssdk.services.connect.model.UpdateQuickConnectConfigRequest;
 import software.amazon.awssdk.services.connect.model.UpdateQuickConnectNameRequest;
-import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
-import software.amazon.cloudformation.proxy.Logger;
-import software.amazon.cloudformation.proxy.ProgressEvent;
-import software.amazon.cloudformation.proxy.ProxyClient;
-import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
+import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
+import software.amazon.cloudformation.exceptions.CfnNotUpdatableException;
+import software.amazon.cloudformation.proxy.*;
 
 import java.util.Collection;
 import java.util.Map;
@@ -40,6 +38,10 @@ public class UpdateHandler extends BaseHandlerStd {
         final Set<Tag> tagsToAdd = Sets.difference(desiredResourceTags, previousResourceTags);
 
         logger.log(String.format("Invoked UpdateQuickConnectHandler with QuickConnect:%s", desiredStateModel.getQuickConnectArn()));
+
+        if (StringUtils.isNotEmpty(desiredStateModel.getInstanceArn()) && !desiredStateModel.getInstanceArn().equals(previousStateModel.getInstanceArn())){
+            throw new CfnInvalidRequestException("InstanceArn cannot be updated.");
+        }
 
         return ProgressEvent.progress(request.getDesiredResourceState(), callbackContext)
                 .then(progress -> updateQuickConnectName(proxy, proxyClient, desiredStateModel, previousStateModel, progress, callbackContext, logger))
