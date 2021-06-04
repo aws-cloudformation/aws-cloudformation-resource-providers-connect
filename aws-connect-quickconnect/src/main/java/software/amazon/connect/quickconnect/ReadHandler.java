@@ -32,9 +32,10 @@ public class ReadHandler extends BaseHandlerStd {
 
         logger.log(String.format("Invoked new ReadQuickConnectHandler with QuickConnect:%s", quickConnectArn));
 
-        if(!isValidQuickConnectArn(quickConnectArn)) {
+        if (!isValidQuickConnectArn(quickConnectArn)) {
             throw new CfnNotFoundException(new CfnInvalidRequestException(String.format("%s is not a valid Quick Connect Arn", quickConnectArn)));
         }
+
         return proxy.initiate("connect::describeQuickConnect", proxyClient, model, callbackContext)
                 .translateToServiceRequest(this::translateToDescribeQuickConnectRequest)
                 .makeServiceCall((req, clientProxy) -> invoke(req, clientProxy, clientProxy.client()::describeQuickConnect, logger))

@@ -2,6 +2,8 @@ package software.amazon.connect.quickconnect;
 
 import software.amazon.awssdk.services.connect.ConnectClient;
 import software.amazon.awssdk.services.connect.model.DeleteQuickConnectRequest;
+import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
+import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
@@ -22,6 +24,10 @@ public class DeleteHandler extends BaseHandlerStd {
         final String quickConnectArn = model.getQuickConnectArn();
 
         logger.log(String.format("Invoked DeleteQuickConnectHandler with QuickConnect:%s", quickConnectArn));
+
+        if(!isValidQuickConnectArn(quickConnectArn)) {
+            throw new CfnNotFoundException(new CfnInvalidRequestException(String.format("%s is not a valid Quick Connect Arn", quickConnectArn)));
+        }
 
         return proxy.initiate("connect::deleteQuickConnect", proxyClient, model, callbackContext)
                 .translateToServiceRequest(this::translateToDeleteQuickConnectRequest)

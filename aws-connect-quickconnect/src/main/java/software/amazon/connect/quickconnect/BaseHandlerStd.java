@@ -167,7 +167,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     }
 
     protected static boolean isValidQuickConnectArn(final String arn) {
-        if(Objects.isNull(arn)) {
+        if (Objects.isNull(arn)) {
             return false;
         }
         return arn.matches(QUICK_CONNECT_ARN_PATTERN);

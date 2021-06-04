@@ -18,11 +18,8 @@ public class QuickConnectTestDataProvider {
     protected static final String QUEUE_ARN = "arn:aws:connect:us-west-2:111111111111:instance/instanceId/queue/queueId";
     protected static final String QUEUE_ID = "queueId";
     protected static final String PHONE_NUMBER = "+1234567890";
-    protected static final String CONTACT_FLOW_ARN_2 = "arn:aws:connect:us-west-2:111111111111:instance/instanceId/contact-flow/contactFlowId2";
     protected static final String CONTACT_FLOW_ID_2 = "contactFlowId2";
-    protected static final String USER_ARN_2 = "arn:aws:connect:us-west-2:111111111111:instance/instanceId/agent/userId2";
     protected static final String USER_ID_2 = "userId2";
-    protected static final String QUEUE_ARN_2 = "arn:aws:connect:us-west-2:111111111111:instance/instanceId/queue/queueId2";
     protected static final String QUEUE_ID_2 = "queueId2";
     protected static final String PHONE_NUMBER_2 = "+9876543210";
     protected static final String INSTANCE_ARN = "arn:aws:connect:us-west-2:111111111111:instance/instanceId";

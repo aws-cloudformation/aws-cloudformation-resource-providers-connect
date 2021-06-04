@@ -6,12 +6,14 @@ import org.mockito.ArgumentCaptor;
 import software.amazon.awssdk.services.connect.ConnectClient;
 import software.amazon.awssdk.services.connect.model.DeleteQuickConnectRequest;
 import software.amazon.awssdk.services.connect.model.DeleteQuickConnectResponse;
+import software.amazon.awssdk.services.connect.model.DescribeQuickConnectRequest;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Credentials;
 import software.amazon.cloudformation.proxy.LoggerProxy;
@@ -31,6 +33,7 @@ import static org.mockito.Mockito.when;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.INSTANCE_ARN;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUICK_CONNECT_ARN;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.TAGS_ONE;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.buildQuickConnectResourceModelWithQuickConnectTypePhoneNumber;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.buildQuickConnectResourceModelWithQuickConnectTypeQueue;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.buildQuickConnectResourceModelWithQuickConnectTypeUser;
 
@@ -56,7 +59,6 @@ public class DeleteHandlerTest {
 
     @AfterEach
     public void post_execute() {
-        verify(connectClient, atLeastOnce()).serviceName();
         verifyNoMoreInteractions(proxyClient.client());
     }
 
@@ -86,6 +88,8 @@ public class DeleteHandlerTest {
         verify(proxyClient.client()).deleteQuickConnect(deleteQuickConnectRequestArgumentCaptor.capture());
         assertThat(deleteQuickConnectRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(deleteQuickConnectRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
+
+        verify(connectClient, atLeastOnce()).serviceName();
     }
 
     @Test
@@ -105,5 +109,21 @@ public class DeleteHandlerTest {
         verify(proxyClient.client()).deleteQuickConnect(deleteQuickConnectRequestArgumentCaptor.capture());
         assertThat(deleteQuickConnectRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(deleteQuickConnectRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
+
+        verify(connectClient, atLeastOnce()).serviceName();
+    }
+
+    @Test
+    public void testHandleRequest_CfnNotFoundException_InvalidQuickConnectArn() {
+        final ArgumentCaptor<DescribeQuickConnectRequest> describeQuickConnectRequestArgumentCaptor = ArgumentCaptor.forClass(DescribeQuickConnectRequest.class);
+        final ResourceModel model = buildQuickConnectResourceModelWithQuickConnectTypePhoneNumber();
+        model.setQuickConnectArn("InvalidQCArn");
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .build();
+
+        assertThrows(CfnNotFoundException.class, () ->
+                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+        assertThat(describeQuickConnectRequestArgumentCaptor.getAllValues().size()).isEqualTo(0);
     }
 }

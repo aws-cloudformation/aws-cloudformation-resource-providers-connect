@@ -9,8 +9,11 @@ import software.amazon.awssdk.services.connect.model.UntagResourceRequest;
 import software.amazon.awssdk.services.connect.model.UpdateQuickConnectConfigRequest;
 import software.amazon.awssdk.services.connect.model.UpdateQuickConnectNameRequest;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
-import software.amazon.cloudformation.exceptions.CfnNotUpdatableException;
-import software.amazon.cloudformation.proxy.*;
+import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.Logger;
+import software.amazon.cloudformation.proxy.ProgressEvent;
+import software.amazon.cloudformation.proxy.ProxyClient;
+import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import java.util.Collection;
 import java.util.Map;

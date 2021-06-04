@@ -12,6 +12,7 @@ import software.amazon.awssdk.services.connect.model.DescribeQuickConnectRequest
 import software.amazon.awssdk.services.connect.model.DescribeQuickConnectResponse;
 import software.amazon.awssdk.services.connect.model.QuickConnectType;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
+import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Credentials;
 import software.amazon.cloudformation.proxy.LoggerProxy;
@@ -75,7 +76,6 @@ public class ReadHandlerTest {
 
     @AfterEach
     public void post_execute() {
-        verify(connectClient, atLeastOnce()).serviceName();
         verifyNoMoreInteractions(proxyClient.client());
     }
 
@@ -115,6 +115,8 @@ public class ReadHandlerTest {
         verify(proxyClient.client()).describeQuickConnect(describeQuickConnectRequestArgumentCaptor.capture());
         assertThat(describeQuickConnectRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(describeQuickConnectRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
+
+        verify(connectClient, atLeastOnce()).serviceName();
     }
 
     @Test
@@ -152,6 +154,8 @@ public class ReadHandlerTest {
         verify(proxyClient.client()).describeQuickConnect(describeQuickConnectRequestArgumentCaptor.capture());
         assertThat(describeQuickConnectRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(describeQuickConnectRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
+
+        verify(connectClient, atLeastOnce()).serviceName();
     }
 
     @Test
@@ -188,6 +192,8 @@ public class ReadHandlerTest {
         verify(proxyClient.client()).describeQuickConnect(describeQuickConnectRequestArgumentCaptor.capture());
         assertThat(describeQuickConnectRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(describeQuickConnectRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
+
+        verify(connectClient, atLeastOnce()).serviceName();
     }
 
     @Test
@@ -205,5 +211,20 @@ public class ReadHandlerTest {
         verify(proxyClient.client()).describeQuickConnect(describeQuickConnectRequestArgumentCaptor.capture());
         assertThat(describeQuickConnectRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(describeQuickConnectRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
+
+        verify(connectClient, atLeastOnce()).serviceName();
+    }
+
+    @Test
+    public void testHandleRequest_CfnNotFoundException_InvalidQuickConnectArn() {
+        final ArgumentCaptor<DescribeQuickConnectRequest> describeQuickConnectRequestArgumentCaptor = ArgumentCaptor.forClass(DescribeQuickConnectRequest.class);
+        modelWithQuickConnectTypePhoneNumber.setQuickConnectArn("InvalidQCArn");
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(modelWithQuickConnectTypePhoneNumber)
+                .build();
+
+        assertThrows(CfnNotFoundException.class, () ->
+                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+        assertThat(describeQuickConnectRequestArgumentCaptor.getAllValues().size()).isEqualTo(0);
     }
 }
