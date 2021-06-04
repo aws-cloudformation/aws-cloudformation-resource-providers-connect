@@ -33,6 +33,7 @@ import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -51,6 +52,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     private static final String ACCESS_DENIED_ERROR_CODE = "AccessDeniedException";
     private static final String INVALID_QUICK_CONNECT_TYPE = "Invalid QuickConnectType: %s";
     private static final String TRANSFER_DESTINATION = "transfer-destination";
+    private static final String QUICK_CONNECT_ARN_PATTERN = "^arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*/transfer-destination/[-a-zA-Z0-9]*$";
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
@@ -162,5 +164,12 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
 
     protected static String getInstanceArnFromQuickConnectArn(final String quickConnectArn) {
         return quickConnectArn.substring(0, quickConnectArn.indexOf(TRANSFER_DESTINATION) - 1);
+    }
+
+    protected static boolean isValidQuickConnectArn(final String arn) {
+        if(Objects.isNull(arn)) {
+            return false;
+        }
+        return arn.matches(QUICK_CONNECT_ARN_PATTERN);
     }
 }

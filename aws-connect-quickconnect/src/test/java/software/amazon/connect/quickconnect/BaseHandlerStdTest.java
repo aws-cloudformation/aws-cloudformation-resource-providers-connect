@@ -34,8 +34,8 @@ import java.util.Set;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.CONTACT_FLOW_ID;
@@ -236,5 +236,20 @@ public class BaseHandlerStdTest {
     @Test
     public void testGetInstanceArnFromQuickConnectArn() {
         assertThat(BaseHandlerStd.getInstanceArnFromQuickConnectArn(QUICK_CONNECT_ARN)).isEqualTo(INSTANCE_ARN);
+    }
+
+    @Test
+    public void testIsValidQuickConnectArn_ValidArn() {
+        assertTrue(BaseHandlerStd.isValidQuickConnectArn(QUICK_CONNECT_ARN));
+    }
+
+    @Test
+    public void testIsValidQuickConnectArn_InvalidArn() {
+        assertFalse(BaseHandlerStd.isValidQuickConnectArn(INSTANCE_ARN));
+    }
+
+    @Test
+    public void testIsValidQuickConnectArn_InvalidNull() {
+        assertFalse(BaseHandlerStd.isValidQuickConnectArn(null));
     }
 }
