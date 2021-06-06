@@ -62,6 +62,7 @@ public class BaseHandlerStdTest {
     private static final String MISSING_MANDATORY_PARAMETER_EXCEPTION_MESSAGE = "Invalid request provided: Required parameter missing " + PARAMETER_NAME;
     private static final String INVALID_QUICK_CONNECT_TYPE = "InvalidQuickConnectType";
     private static final String ACCESS_DENIED_ERROR_CODE = "AccessDeniedException";
+    private static final String THROTTLING_ERROR_CODE = "TooManyRequestsException";
     private static final String CONNECT_EXCEPTION_ERROR_CODE = "ConnectException";
 
     @Mock
@@ -110,7 +111,12 @@ public class BaseHandlerStdTest {
 
     @Test
     public void testHandleCommonExceptions_ThrottlingException() {
-        Exception ex = ThrottlingException.builder().build();
+        Exception ex = ConnectException.builder()
+                .statusCode(429)
+                .awsErrorDetails(AwsErrorDetails.builder()
+                        .errorCode(THROTTLING_ERROR_CODE)
+                        .build())
+                .build();
         assertThrows(CfnThrottlingException.class, () ->
                 BaseHandlerStd.handleCommonExceptions(ex, logger));
     }

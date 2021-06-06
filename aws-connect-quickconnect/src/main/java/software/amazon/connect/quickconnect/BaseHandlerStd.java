@@ -50,6 +50,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     private static final String CONTACT_FLOW_ID = "ContactFlowId";
     private static final String PHONE_NUMBER = "PhoneNumber";
     private static final String ACCESS_DENIED_ERROR_CODE = "AccessDeniedException";
+    private static final String THROTTLING_ERROR_CODE = "TooManyRequestsException";
     private static final String INVALID_QUICK_CONNECT_TYPE = "Invalid QuickConnectType: %s";
     private static final String TRANSFER_DESTINATION = "transfer-destination";
     private static final String QUICK_CONNECT_ARN_PATTERN = "^arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*/transfer-destination/[-a-zA-Z0-9]*$";
@@ -82,12 +83,12 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
             throw new CfnInvalidRequestException(ex);
         } else if (ex instanceof InternalServiceException) {
             throw new CfnServiceInternalErrorException(ex);
-        } else if (ex instanceof ThrottlingException) {
-            throw new CfnThrottlingException(ex);
         } else if (ex instanceof DuplicateResourceException) {
             throw new CfnAlreadyExistsException(ex);
         } else if (ex instanceof LimitExceededException) {
             throw new CfnServiceLimitExceededException(ex);
+        } else if (ex instanceof ConnectException && StringUtils.equals(THROTTLING_ERROR_CODE, ((ConnectException) ex).awsErrorDetails().errorCode())) {
+            throw new CfnThrottlingException(ex);
         } else if (ex instanceof ConnectException && StringUtils.equals(ACCESS_DENIED_ERROR_CODE, ((ConnectException) ex).awsErrorDetails().errorCode())) {
             throw new CfnAccessDeniedException(ex);
         }
