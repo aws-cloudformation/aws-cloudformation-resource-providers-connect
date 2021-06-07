@@ -21,3 +21,6 @@ rpdk.log*
 
 # contains credentials
 sam-tests/
+
+# contract tests
+inputs/

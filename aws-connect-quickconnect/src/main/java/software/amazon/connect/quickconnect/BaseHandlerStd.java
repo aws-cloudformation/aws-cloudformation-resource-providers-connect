@@ -1,25 +1,29 @@
 package software.amazon.connect.quickconnect;
 
 import com.google.common.collect.Sets;
+import org.apache.commons.lang3.StringUtils;
 import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.awscore.AwsResponse;
 import software.amazon.awssdk.services.connect.ConnectClient;
+import software.amazon.awssdk.services.connect.model.ConnectException;
 import software.amazon.awssdk.services.connect.model.DuplicateResourceException;
 import software.amazon.awssdk.services.connect.model.InternalServiceException;
 import software.amazon.awssdk.services.connect.model.InvalidParameterException;
 import software.amazon.awssdk.services.connect.model.InvalidRequestException;
+import software.amazon.awssdk.services.connect.model.LimitExceededException;
 import software.amazon.awssdk.services.connect.model.PhoneNumberQuickConnectConfig;
 import software.amazon.awssdk.services.connect.model.QueueQuickConnectConfig;
 import software.amazon.awssdk.services.connect.model.QuickConnectConfig;
 import software.amazon.awssdk.services.connect.model.QuickConnectType;
 import software.amazon.awssdk.services.connect.model.ResourceNotFoundException;
-import software.amazon.awssdk.services.connect.model.ThrottlingException;
 import software.amazon.awssdk.services.connect.model.UserQuickConnectConfig;
+import software.amazon.cloudformation.exceptions.CfnAccessDeniedException;
 import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
+import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
 import software.amazon.cloudformation.exceptions.CfnThrottlingException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
@@ -43,6 +47,9 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     private static final String QUEUE_ID = "QueueId";
     private static final String CONTACT_FLOW_ID = "ContactFlowId";
     private static final String PHONE_NUMBER = "PhoneNumber";
+    private static final String ACCESS_DENIED_ERROR_CODE = "AccessDeniedException";
+    private static final String THROTTLING_ERROR_CODE = "TooManyRequestsException";
+    private static final String INVALID_QUICK_CONNECT_TYPE = "Invalid QuickConnectType: %s";
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
@@ -72,10 +79,14 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
             throw new CfnInvalidRequestException(ex);
         } else if (ex instanceof InternalServiceException) {
             throw new CfnServiceInternalErrorException(ex);
-        } else if (ex instanceof ThrottlingException) {
-            throw new CfnThrottlingException(ex);
         } else if (ex instanceof DuplicateResourceException) {
             throw new CfnAlreadyExistsException(ex);
+        } else if (ex instanceof LimitExceededException) {
+            throw new CfnServiceLimitExceededException(ex);
+        } else if (ex instanceof ConnectException && StringUtils.equals(THROTTLING_ERROR_CODE, ((ConnectException) ex).awsErrorDetails().errorCode())) {
+            throw new CfnThrottlingException(ex);
+        } else if (ex instanceof ConnectException && StringUtils.equals(ACCESS_DENIED_ERROR_CODE, ((ConnectException) ex).awsErrorDetails().errorCode())) {
+            throw new CfnAccessDeniedException(ex);
         }
         logger.log(String.format("Exception in handler:%s", ex));
         throw new CfnGeneralServiceException(ex);
@@ -98,11 +109,11 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
         final String quickConnectType = model.getQuickConnectConfig().getQuickConnectType();
         if (quickConnectType.equals(QuickConnectType.USER.toString())) {
             requireNotNull(model.getQuickConnectConfig().getUserConfig(), QUICK_CONNECT_USER_CONFIG);
-            requireNotNull(model.getQuickConnectConfig().getUserConfig().getUserId(), USER_ID);
-            requireNotNull(model.getQuickConnectConfig().getUserConfig().getContactFlowId(), CONTACT_FLOW_ID);
+            requireNotNull(model.getQuickConnectConfig().getUserConfig().getUserArn(), USER_ID);
+            requireNotNull(model.getQuickConnectConfig().getUserConfig().getContactFlowArn(), CONTACT_FLOW_ID);
             final software.amazon.awssdk.services.connect.model.UserQuickConnectConfig userQuickConnectConfig = UserQuickConnectConfig.builder()
-                    .userId(model.getQuickConnectConfig().getUserConfig().getUserId())
-                    .contactFlowId(model.getQuickConnectConfig().getUserConfig().getContactFlowId())
+                    .userId(model.getQuickConnectConfig().getUserConfig().getUserArn())
+                    .contactFlowId(model.getQuickConnectConfig().getUserConfig().getContactFlowArn())
                     .build();
             return software.amazon.awssdk.services.connect.model.QuickConnectConfig.builder()
                     .quickConnectType(quickConnectType)
@@ -110,11 +121,11 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
                     .build();
         } else if (quickConnectType.equals(QuickConnectType.QUEUE.toString())) {
             requireNotNull(model.getQuickConnectConfig().getQueueConfig(), QUICK_CONNECT_QUEUE_CONFIG);
-            requireNotNull(model.getQuickConnectConfig().getQueueConfig().getQueueId(), QUEUE_ID);
-            requireNotNull(model.getQuickConnectConfig().getQueueConfig().getContactFlowId(), CONTACT_FLOW_ID);
+            requireNotNull(model.getQuickConnectConfig().getQueueConfig().getQueueArn(), QUEUE_ID);
+            requireNotNull(model.getQuickConnectConfig().getQueueConfig().getContactFlowArn(), CONTACT_FLOW_ID);
             final software.amazon.awssdk.services.connect.model.QueueQuickConnectConfig queueQuickConnectConfig = QueueQuickConnectConfig.builder()
-                    .queueId(model.getQuickConnectConfig().getQueueConfig().getQueueId())
-                    .contactFlowId(model.getQuickConnectConfig().getQueueConfig().getContactFlowId())
+                    .queueId(model.getQuickConnectConfig().getQueueConfig().getQueueArn())
+                    .contactFlowId(model.getQuickConnectConfig().getQueueConfig().getContactFlowArn())
                     .build();
             return software.amazon.awssdk.services.connect.model.QuickConnectConfig.builder()
                     .quickConnectType(quickConnectType)
@@ -131,7 +142,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
                     .phoneConfig(phoneNumberQuickConnectConfig)
                     .build();
         }
-        throw new CfnInvalidRequestException("Invalid QuickConnectType:" + quickConnectType);
+        throw new CfnInvalidRequestException(String.format(INVALID_QUICK_CONNECT_TYPE, quickConnectType));
     }
 
     protected static Set<Tag> convertResourceTagsToSet(final Map<String, String> resourceTags) {

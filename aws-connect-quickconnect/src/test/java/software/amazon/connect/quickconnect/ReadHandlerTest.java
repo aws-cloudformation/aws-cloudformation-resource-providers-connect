@@ -10,7 +10,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import software.amazon.awssdk.services.connect.model.DescribeQuickConnectRequest;
 import software.amazon.awssdk.services.connect.model.DescribeQuickConnectResponse;
+import software.amazon.awssdk.services.connect.model.QuickConnectType;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
+import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Credentials;
 import software.amazon.cloudformation.proxy.LoggerProxy;
@@ -27,8 +29,18 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.INSTANCE_ID;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.CONTACT_FLOW_ARN;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.INSTANCE_ARN;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.PHONE_NUMBER;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUEUE_ARN;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUICK_CONNECT_ARN;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUICK_CONNECT_DESCRIPTION_ONE;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUICK_CONNECT_DESCRIPTION_THREE;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUICK_CONNECT_DESCRIPTION_TWO;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUICK_CONNECT_NAME_ONE;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUICK_CONNECT_NAME_THREE;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUICK_CONNECT_NAME_TWO;
+import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.USER_ARN;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.buildQuickConnectResourceModelWithQuickConnectTypePhoneNumber;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.buildQuickConnectResourceModelWithQuickConnectTypeQueue;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.buildQuickConnectResourceModelWithQuickConnectTypeUser;
@@ -64,7 +76,6 @@ public class ReadHandlerTest {
 
     @AfterEach
     public void post_execute() {
-        verify(connectClient, atLeastOnce()).serviceName();
         verifyNoMoreInteractions(proxyClient.client());
     }
 
@@ -88,22 +99,24 @@ public class ReadHandlerTest {
         assertThat(response.getCallbackContext()).isNull();
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModels()).isNull();
-        assertThat(response.getResourceModel().getInstanceId()).isEqualTo(modelWithQuickConnectTypeUser.getInstanceId());
-        assertThat(response.getResourceModel().getQuickConnectId()).isEqualTo(modelWithQuickConnectTypeUser.getQuickConnectId());
-        assertThat(response.getResourceModel().getDescription()).isEqualTo(modelWithQuickConnectTypeUser.getDescription());
-        assertThat(response.getResourceModel().getName()).isEqualTo(modelWithQuickConnectTypeUser.getName());
+        assertThat(response.getResourceModel().getInstanceArn()).isEqualTo(INSTANCE_ARN);
+        assertThat(response.getResourceModel().getQuickConnectArn()).isEqualTo(QUICK_CONNECT_ARN);
+        assertThat(response.getResourceModel().getDescription()).isEqualTo(QUICK_CONNECT_DESCRIPTION_ONE);
+        assertThat(response.getResourceModel().getName()).isEqualTo(QUICK_CONNECT_NAME_ONE);
         assertThat(response.getResourceModel().getQuickConnectConfig().getQueueConfig()).isNull();
         assertThat(response.getResourceModel().getQuickConnectConfig().getPhoneConfig()).isNull();
         assertThat(response.getResourceModel().getQuickConnectConfig().getUserConfig()).isNotNull();
-        assertThat(response.getResourceModel().getQuickConnectConfig().getQuickConnectType()).isEqualTo(modelWithQuickConnectTypeUser.getQuickConnectConfig().getQuickConnectType());
-        assertThat(response.getResourceModel().getQuickConnectConfig().getUserConfig().getUserId()).isEqualTo(modelWithQuickConnectTypeUser.getQuickConnectConfig().getUserConfig().getUserId());
-        assertThat(response.getResourceModel().getQuickConnectConfig().getUserConfig().getContactFlowId()).isEqualTo(modelWithQuickConnectTypeUser.getQuickConnectConfig().getUserConfig().getContactFlowId());
+        assertThat(response.getResourceModel().getQuickConnectConfig().getQuickConnectType()).isEqualTo(QuickConnectType.USER.toString());
+        assertThat(response.getResourceModel().getQuickConnectConfig().getUserConfig().getUserArn()).isEqualTo(USER_ARN);
+        assertThat(response.getResourceModel().getQuickConnectConfig().getUserConfig().getContactFlowArn()).isEqualTo(CONTACT_FLOW_ARN);
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
 
         verify(proxyClient.client()).describeQuickConnect(describeQuickConnectRequestArgumentCaptor.capture());
-        assertThat(describeQuickConnectRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(describeQuickConnectRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(describeQuickConnectRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
+
+        verify(connectClient, atLeastOnce()).serviceName();
     }
 
     @Test
@@ -125,22 +138,24 @@ public class ReadHandlerTest {
         assertThat(response.getCallbackContext()).isNull();
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModels()).isNull();
-        assertThat(response.getResourceModel().getInstanceId()).isEqualTo(modelWithQuickConnectTypeQueue.getInstanceId());
-        assertThat(response.getResourceModel().getQuickConnectId()).isEqualTo(modelWithQuickConnectTypeQueue.getQuickConnectId());
-        assertThat(response.getResourceModel().getDescription()).isEqualTo(modelWithQuickConnectTypeQueue.getDescription());
-        assertThat(response.getResourceModel().getName()).isEqualTo(modelWithQuickConnectTypeQueue.getName());
+        assertThat(response.getResourceModel().getInstanceArn()).isEqualTo(INSTANCE_ARN);
+        assertThat(response.getResourceModel().getQuickConnectArn()).isEqualTo(QUICK_CONNECT_ARN);
+        assertThat(response.getResourceModel().getDescription()).isEqualTo(QUICK_CONNECT_DESCRIPTION_TWO);
+        assertThat(response.getResourceModel().getName()).isEqualTo(QUICK_CONNECT_NAME_TWO);
         assertThat(response.getResourceModel().getQuickConnectConfig().getQueueConfig()).isNotNull();
         assertThat(response.getResourceModel().getQuickConnectConfig().getPhoneConfig()).isNull();
         assertThat(response.getResourceModel().getQuickConnectConfig().getUserConfig()).isNull();
-        assertThat(response.getResourceModel().getQuickConnectConfig().getQuickConnectType()).isEqualTo(modelWithQuickConnectTypeQueue.getQuickConnectConfig().getQuickConnectType());
-        assertThat(response.getResourceModel().getQuickConnectConfig().getQueueConfig().getQueueId()).isEqualTo(modelWithQuickConnectTypeQueue.getQuickConnectConfig().getQueueConfig().getQueueId());
-        assertThat(response.getResourceModel().getQuickConnectConfig().getQueueConfig().getContactFlowId()).isEqualTo(modelWithQuickConnectTypeQueue.getQuickConnectConfig().getQueueConfig().getContactFlowId());
+        assertThat(response.getResourceModel().getQuickConnectConfig().getQuickConnectType()).isEqualTo(QuickConnectType.QUEUE.toString());
+        assertThat(response.getResourceModel().getQuickConnectConfig().getQueueConfig().getQueueArn()).isEqualTo(QUEUE_ARN);
+        assertThat(response.getResourceModel().getQuickConnectConfig().getQueueConfig().getContactFlowArn()).isEqualTo(CONTACT_FLOW_ARN);
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
 
         verify(proxyClient.client()).describeQuickConnect(describeQuickConnectRequestArgumentCaptor.capture());
-        assertThat(describeQuickConnectRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(describeQuickConnectRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(describeQuickConnectRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
+
+        verify(connectClient, atLeastOnce()).serviceName();
     }
 
     @Test
@@ -162,21 +177,23 @@ public class ReadHandlerTest {
         assertThat(response.getCallbackContext()).isNull();
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModels()).isNull();
-        assertThat(response.getResourceModel().getInstanceId()).isEqualTo(modelWithQuickConnectTypePhoneNumber.getInstanceId());
-        assertThat(response.getResourceModel().getQuickConnectId()).isEqualTo(modelWithQuickConnectTypePhoneNumber.getQuickConnectId());
-        assertThat(response.getResourceModel().getDescription()).isEqualTo(modelWithQuickConnectTypePhoneNumber.getDescription());
-        assertThat(response.getResourceModel().getName()).isEqualTo(modelWithQuickConnectTypePhoneNumber.getName());
+        assertThat(response.getResourceModel().getInstanceArn()).isEqualTo(INSTANCE_ARN);
+        assertThat(response.getResourceModel().getQuickConnectArn()).isEqualTo(QUICK_CONNECT_ARN);
+        assertThat(response.getResourceModel().getDescription()).isEqualTo(QUICK_CONNECT_DESCRIPTION_THREE);
+        assertThat(response.getResourceModel().getName()).isEqualTo(QUICK_CONNECT_NAME_THREE);
         assertThat(response.getResourceModel().getQuickConnectConfig().getQueueConfig()).isNull();
         assertThat(response.getResourceModel().getQuickConnectConfig().getPhoneConfig()).isNotNull();
         assertThat(response.getResourceModel().getQuickConnectConfig().getUserConfig()).isNull();
-        assertThat(response.getResourceModel().getQuickConnectConfig().getQuickConnectType()).isEqualTo(modelWithQuickConnectTypePhoneNumber.getQuickConnectConfig().getQuickConnectType());
-        assertThat(response.getResourceModel().getQuickConnectConfig().getPhoneConfig().getPhoneNumber()).isEqualTo(modelWithQuickConnectTypePhoneNumber.getQuickConnectConfig().getPhoneConfig().getPhoneNumber());
+        assertThat(response.getResourceModel().getQuickConnectConfig().getQuickConnectType()).isEqualTo(QuickConnectType.PHONE_NUMBER.toString());
+        assertThat(response.getResourceModel().getQuickConnectConfig().getPhoneConfig().getPhoneNumber()).isEqualTo(PHONE_NUMBER);
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
 
         verify(proxyClient.client()).describeQuickConnect(describeQuickConnectRequestArgumentCaptor.capture());
-        assertThat(describeQuickConnectRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(describeQuickConnectRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(describeQuickConnectRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
+
+        verify(connectClient, atLeastOnce()).serviceName();
     }
 
     @Test
@@ -192,7 +209,22 @@ public class ReadHandlerTest {
                 handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
 
         verify(proxyClient.client()).describeQuickConnect(describeQuickConnectRequestArgumentCaptor.capture());
-        assertThat(describeQuickConnectRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ID);
+        assertThat(describeQuickConnectRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(describeQuickConnectRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
+
+        verify(connectClient, atLeastOnce()).serviceName();
+    }
+
+    @Test
+    public void testHandleRequest_CfnNotFoundException_InvalidQuickConnectArn() {
+        final ArgumentCaptor<DescribeQuickConnectRequest> describeQuickConnectRequestArgumentCaptor = ArgumentCaptor.forClass(DescribeQuickConnectRequest.class);
+        modelWithQuickConnectTypePhoneNumber.setQuickConnectArn("InvalidQCArn");
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(modelWithQuickConnectTypePhoneNumber)
+                .build();
+
+        assertThrows(CfnNotFoundException.class, () ->
+                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+        assertThat(describeQuickConnectRequestArgumentCaptor.getAllValues().size()).isEqualTo(0);
     }
 }

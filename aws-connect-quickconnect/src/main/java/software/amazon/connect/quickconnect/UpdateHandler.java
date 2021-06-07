@@ -8,6 +8,7 @@ import software.amazon.awssdk.services.connect.model.TagResourceRequest;
 import software.amazon.awssdk.services.connect.model.UntagResourceRequest;
 import software.amazon.awssdk.services.connect.model.UpdateQuickConnectConfigRequest;
 import software.amazon.awssdk.services.connect.model.UpdateQuickConnectNameRequest;
+import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
@@ -39,13 +40,17 @@ public class UpdateHandler extends BaseHandlerStd {
         final Set<Tag> tagsToRemove = Sets.difference(previousResourceTags, desiredResourceTags);
         final Set<Tag> tagsToAdd = Sets.difference(desiredResourceTags, previousResourceTags);
 
-        logger.log(String.format("Invoked UpdateQuickConnectHandler with QuickConnect:%s", desiredStateModel.getQuickConnectARN()));
+        logger.log(String.format("Invoked UpdateQuickConnectHandler with QuickConnect:%s", desiredStateModel.getQuickConnectArn()));
+
+        if (StringUtils.isNotEmpty(desiredStateModel.getInstanceArn()) && !desiredStateModel.getInstanceArn().equals(previousStateModel.getInstanceArn())) {
+            throw new CfnInvalidRequestException("InstanceArn cannot be updated.");
+        }
 
         return ProgressEvent.progress(request.getDesiredResourceState(), callbackContext)
                 .then(progress -> updateQuickConnectName(proxy, proxyClient, desiredStateModel, previousStateModel, progress, callbackContext, logger))
                 .then(progress -> updateQuickConnectConfig(proxy, proxyClient, desiredStateModel, previousStateModel, progress, callbackContext, logger))
-                .then(progress -> tagResource(proxy, proxyClient, desiredStateModel, tagsToAdd, progress, callbackContext, logger))
                 .then(progress -> unTagResource(proxy, proxyClient, desiredStateModel, tagsToRemove, progress, callbackContext, logger))
+                .then(progress -> tagResource(proxy, proxyClient, desiredStateModel, tagsToAdd, progress, callbackContext, logger))
                 .then(progress -> ProgressEvent.defaultSuccessHandler(desiredStateModel));
     }
 
@@ -61,14 +66,14 @@ public class UpdateHandler extends BaseHandlerStd {
         final boolean updateQuickConnectDescription = !StringUtils.equals(desiredStateModel.getDescription(), previousStateModel.getDescription());
 
         if (updateQuickConnectName || updateQuickConnectDescription) {
-            logger.log(String.format("Calling UpdateQuickConnectName API for QuickConnect:%s", desiredStateModel.getQuickConnectARN()));
+            logger.log(String.format("Calling UpdateQuickConnectName API for QuickConnect:%s", desiredStateModel.getQuickConnectArn()));
             return proxy.initiate("connect::updateQuickConnectName", proxyClient, desiredStateModel, context)
                     .translateToServiceRequest(UpdateHandler::translateToUpdateQuickConnectNameRequest)
                     .makeServiceCall((req, clientProxy) -> invoke(req, clientProxy, clientProxy.client()::updateQuickConnectName, logger))
                     .progress();
         } else {
             logger.log(String.format("QuickConnect name and description fields are unchanged from in the update operation, " +
-                    "skipping UpdateQuickConnectName API call for QuickConnect:%s", desiredStateModel.getQuickConnectARN()));
+                    "skipping UpdateQuickConnectName API call for QuickConnect:%s", desiredStateModel.getQuickConnectArn()));
             return progress;
         }
     }
@@ -76,8 +81,8 @@ public class UpdateHandler extends BaseHandlerStd {
     private static UpdateQuickConnectNameRequest translateToUpdateQuickConnectNameRequest(final ResourceModel model) {
         return UpdateQuickConnectNameRequest
                 .builder()
-                .instanceId(model.getInstanceId())
-                .quickConnectId(model.getQuickConnectARN())
+                .instanceId(model.getInstanceArn())
+                .quickConnectId(model.getQuickConnectArn())
                 .name(model.getName())
                 .description(model.getDescription())
                 .build();
@@ -86,8 +91,8 @@ public class UpdateHandler extends BaseHandlerStd {
     private static UpdateQuickConnectConfigRequest translateToUpdateQuickConnectConfigRequest(final ResourceModel model) {
         return UpdateQuickConnectConfigRequest
                 .builder()
-                .instanceId(model.getInstanceId())
-                .quickConnectId(model.getQuickConnectARN())
+                .instanceId(model.getInstanceArn())
+                .quickConnectId(model.getQuickConnectArn())
                 .quickConnectConfig(translateToQuickConnectConfig(model))
                 .build();
     }
@@ -102,26 +107,26 @@ public class UpdateHandler extends BaseHandlerStd {
         if (!StringUtils.equals(desiredStateModel.getQuickConnectConfig().getQuickConnectType(), previousStateModel.getQuickConnectConfig().getQuickConnectType())) {
             logger.log(String.format("QuickConnectType:%s has changed from current type:%s in update operation, " +
                             "Calling UpdateQuickConnectConfig API for QuickConnect:%s", desiredStateModel.getQuickConnectConfig().getQuickConnectType(),
-                    previousStateModel.getQuickConnectConfig().getQuickConnectType(), desiredStateModel.getQuickConnectARN()));
+                    previousStateModel.getQuickConnectConfig().getQuickConnectType(), desiredStateModel.getQuickConnectArn()));
             return proxy.initiate("connect::updateQuickConnectConfig", proxyClient, desiredStateModel, context)
                     .translateToServiceRequest(UpdateHandler::translateToUpdateQuickConnectConfigRequest)
                     .makeServiceCall((req, clientProxy) -> invoke(req, clientProxy, clientProxy.client()::updateQuickConnectConfig, logger))
                     .progress();
         } else if (StringUtils.equals(desiredStateModel.getQuickConnectConfig().getQuickConnectType(), QuickConnectType.USER.toString())) {
-            if (!StringUtils.equals(desiredStateModel.getQuickConnectConfig().getUserConfig().getContactFlowId(), previousStateModel.getQuickConnectConfig().getUserConfig().getContactFlowId()) ||
-                    !StringUtils.equals(desiredStateModel.getQuickConnectConfig().getUserConfig().getUserId(), previousStateModel.getQuickConnectConfig().getUserConfig().getUserId())) {
+            if (!StringUtils.equals(desiredStateModel.getQuickConnectConfig().getUserConfig().getContactFlowArn(), previousStateModel.getQuickConnectConfig().getUserConfig().getContactFlowArn()) ||
+                    !StringUtils.equals(desiredStateModel.getQuickConnectConfig().getUserConfig().getUserArn(), previousStateModel.getQuickConnectConfig().getUserConfig().getUserArn())) {
                 logger.log(String.format("QuickConnectType:USER is unchanged in update operation but the UserConfig properties " +
-                        "have changed, Calling UpdateQuickConnectConfig API for QuickConnect:%s", desiredStateModel.getQuickConnectARN()));
+                        "have changed, Calling UpdateQuickConnectConfig API for QuickConnect:%s", desiredStateModel.getQuickConnectArn()));
                 return proxy.initiate("connect::updateQuickConnectConfig", proxyClient, desiredStateModel, context)
                         .translateToServiceRequest(UpdateHandler::translateToUpdateQuickConnectConfigRequest)
                         .makeServiceCall((req, clientProxy) -> invoke(req, clientProxy, clientProxy.client()::updateQuickConnectConfig, logger))
                         .progress();
             }
         } else if (StringUtils.equals(desiredStateModel.getQuickConnectConfig().getQuickConnectType(), QuickConnectType.QUEUE.toString())) {
-            if (!StringUtils.equals(desiredStateModel.getQuickConnectConfig().getQueueConfig().getContactFlowId(), previousStateModel.getQuickConnectConfig().getQueueConfig().getContactFlowId()) ||
-                    !StringUtils.equals(desiredStateModel.getQuickConnectConfig().getQueueConfig().getQueueId(), previousStateModel.getQuickConnectConfig().getQueueConfig().getQueueId())) {
+            if (!StringUtils.equals(desiredStateModel.getQuickConnectConfig().getQueueConfig().getContactFlowArn(), previousStateModel.getQuickConnectConfig().getQueueConfig().getContactFlowArn()) ||
+                    !StringUtils.equals(desiredStateModel.getQuickConnectConfig().getQueueConfig().getQueueArn(), previousStateModel.getQuickConnectConfig().getQueueConfig().getQueueArn())) {
                 logger.log(String.format("QuickConnectType:QUEUE is unchanged in update operation but the QueueConfig properties " +
-                        "have changed, Calling UpdateQuickConnectConfig API for QuickConnect:%s", desiredStateModel.getQuickConnectARN()));
+                        "have changed, Calling UpdateQuickConnectConfig API for QuickConnect:%s", desiredStateModel.getQuickConnectArn()));
                 return proxy.initiate("connect::updateQuickConnectConfig", proxyClient, desiredStateModel, context)
                         .translateToServiceRequest(UpdateHandler::translateToUpdateQuickConnectConfigRequest)
                         .makeServiceCall((req, clientProxy) -> invoke(req, clientProxy, clientProxy.client()::updateQuickConnectConfig, logger))
@@ -130,7 +135,7 @@ public class UpdateHandler extends BaseHandlerStd {
         } else if (StringUtils.equals(desiredStateModel.getQuickConnectConfig().getQuickConnectType(), QuickConnectType.PHONE_NUMBER.toString())) {
             if (!StringUtils.equals(desiredStateModel.getQuickConnectConfig().getPhoneConfig().getPhoneNumber(), previousStateModel.getQuickConnectConfig().getPhoneConfig().getPhoneNumber())) {
                 logger.log(String.format("QuickConnectType:PHONE_NUMBER is unchanged in update operation but the PhoneConfig properties " +
-                        "have changed, Calling UpdateQuickConnectConfig API for QuickConnect:%s", desiredStateModel.getQuickConnectARN()));
+                        "have changed, Calling UpdateQuickConnectConfig API for QuickConnect:%s", desiredStateModel.getQuickConnectArn()));
                 return proxy.initiate("connect::updateQuickConnectConfig", proxyClient, desiredStateModel, context)
                         .translateToServiceRequest(UpdateHandler::translateToUpdateQuickConnectConfigRequest)
                         .makeServiceCall((req, clientProxy) -> invoke(req, clientProxy, clientProxy.client()::updateQuickConnectConfig, logger))
@@ -138,7 +143,7 @@ public class UpdateHandler extends BaseHandlerStd {
             }
         }
         logger.log(String.format("QuickConnectConfig is unchanged in the update operation, skipping " +
-                "UpdateQuickConnectConfig API call for QuickConnect:%s", desiredStateModel.getQuickConnectARN()));
+                "UpdateQuickConnectConfig API call for QuickConnect:%s", desiredStateModel.getQuickConnectArn()));
         return progress;
     }
 
@@ -149,7 +154,7 @@ public class UpdateHandler extends BaseHandlerStd {
                                                                       final ProgressEvent<ResourceModel, CallbackContext> progress,
                                                                       final CallbackContext context,
                                                                       final Logger logger) {
-        final String quickConnectArn = desiredStateModel.getQuickConnectARN();
+        final String quickConnectArn = desiredStateModel.getQuickConnectArn();
 
         if (tagsToAdd.size() > 0) {
             logger.log(String.format("Tags have been modified(addition/TagValue updated) in the update operation, " +
@@ -171,7 +176,7 @@ public class UpdateHandler extends BaseHandlerStd {
                                                                         final ProgressEvent<ResourceModel, CallbackContext> progress,
                                                                         final CallbackContext context,
                                                                         final Logger logger) {
-        final String quickConnectArn = desiredStateModel.getQuickConnectARN();
+        final String quickConnectArn = desiredStateModel.getQuickConnectArn();
 
         if (tagsToRemove.size() > 0) {
             logger.log(String.format("Tags have been removed in the update operation, " +
