@@ -14,11 +14,6 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 public class ReadHandler extends BaseHandlerStd {
 
-    private static final String USER_ARN_FORMAT = "%s/agent/%s";
-    private static final String CONTACT_FLOW_ARN_FORMAT = "%s/contact-flow/%s";
-    private static final String QUEUE_ARN_FORMAT = "%s/queue/%s";
-
-
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
             final AmazonWebServicesClientProxy proxy,
@@ -32,7 +27,7 @@ public class ReadHandler extends BaseHandlerStd {
 
         logger.log(String.format("Invoked new ReadQuickConnectHandler with QuickConnect:%s", quickConnectArn));
 
-        if (!isValidQuickConnectArn(quickConnectArn)) {
+        if (!ArnHelper.isValidQuickConnectArn(quickConnectArn)) {
             throw new CfnNotFoundException(new CfnInvalidRequestException(String.format("%s is not a valid Quick Connect Arn", quickConnectArn)));
         }
 
@@ -45,7 +40,7 @@ public class ReadHandler extends BaseHandlerStd {
     private DescribeQuickConnectRequest translateToDescribeQuickConnectRequest(final ResourceModel model) {
         return DescribeQuickConnectRequest
                 .builder()
-                .instanceId(getInstanceArnFromQuickConnectArn(model.getQuickConnectArn()))
+                .instanceId(ArnHelper.getInstanceArnFromQuickConnectArn(model.getQuickConnectArn()))
                 .quickConnectId(model.getQuickConnectArn())
                 .build();
     }
@@ -58,15 +53,15 @@ public class ReadHandler extends BaseHandlerStd {
 
         if (quickConnectType.equals(QuickConnectType.USER.toString())) {
             final software.amazon.connect.quickconnect.UserQuickConnectConfig userQuickConnectConfig = new software.amazon.connect.quickconnect.UserQuickConnectConfig();
-            userQuickConnectConfig.setUserArn(String.format(USER_ARN_FORMAT, instanceArn, quickConnectConfig.userConfig().userId()));
-            userQuickConnectConfig.setContactFlowArn(String.format(CONTACT_FLOW_ARN_FORMAT, instanceArn, quickConnectConfig.userConfig().contactFlowId()));
+            userQuickConnectConfig.setUserArn(ArnHelper.constructUserArn(instanceArn, quickConnectConfig.userConfig().userId()));
+            userQuickConnectConfig.setContactFlowArn(ArnHelper.constructContactFlowArn(instanceArn, quickConnectConfig.userConfig().contactFlowId()));
             resourceModelQuickConnectConfig.setUserConfig(userQuickConnectConfig);
         }
 
         if (quickConnectType.equals(QuickConnectType.QUEUE.toString())) {
             final software.amazon.connect.quickconnect.QueueQuickConnectConfig queueQuickConnectConfig = new software.amazon.connect.quickconnect.QueueQuickConnectConfig();
-            queueQuickConnectConfig.setQueueArn(String.format(QUEUE_ARN_FORMAT, instanceArn, quickConnectConfig.queueConfig().queueId()));
-            queueQuickConnectConfig.setContactFlowArn(String.format(CONTACT_FLOW_ARN_FORMAT, instanceArn, quickConnectConfig.queueConfig().contactFlowId()));
+            queueQuickConnectConfig.setQueueArn(ArnHelper.constructQueueArn(instanceArn, quickConnectConfig.queueConfig().queueId()));
+            queueQuickConnectConfig.setContactFlowArn(ArnHelper.constructContactFlowArn(instanceArn, quickConnectConfig.queueConfig().contactFlowId()));
 
             resourceModelQuickConnectConfig.setQueueConfig(queueQuickConnectConfig);
         }
@@ -80,7 +75,7 @@ public class ReadHandler extends BaseHandlerStd {
     }
 
     private ResourceModel setQuickConnectProperties(final ResourceModel model, final QuickConnect quickConnect) {
-        final String instanceArn = getInstanceArnFromQuickConnectArn(quickConnect.quickConnectARN());
+        final String instanceArn = ArnHelper.getInstanceArnFromQuickConnectArn(quickConnect.quickConnectARN());
         model.setInstanceArn(instanceArn);
         model.setName(quickConnect.name());
         model.setDescription(quickConnect.description());

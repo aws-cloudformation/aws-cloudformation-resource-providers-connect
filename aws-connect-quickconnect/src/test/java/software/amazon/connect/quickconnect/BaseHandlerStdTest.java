@@ -18,7 +18,6 @@ import software.amazon.awssdk.services.connect.model.InvalidRequestException;
 import software.amazon.awssdk.services.connect.model.LimitExceededException;
 import software.amazon.awssdk.services.connect.model.QuickConnectType;
 import software.amazon.awssdk.services.connect.model.ResourceNotFoundException;
-import software.amazon.awssdk.services.connect.model.ThrottlingException;
 import software.amazon.cloudformation.exceptions.CfnAccessDeniedException;
 import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
@@ -35,16 +34,12 @@ import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.CONTACT_FLOW_ID;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.INSTANCE_ARN;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.PHONE_NUMBER;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUEUE_ID;
-import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.QUICK_CONNECT_ARN;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.TAGS_SET_TWO;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.USER_ID;
 import static software.amazon.connect.quickconnect.QuickConnectTestDataProvider.VALID_TAG_KEY_ONE;
@@ -239,25 +234,5 @@ public class BaseHandlerStdTest {
                 .build();
         assertThrows(CfnInvalidRequestException.class, () ->
                 BaseHandlerStd.translateToQuickConnectConfig(resourceModel));
-    }
-
-    @Test
-    public void testGetInstanceArnFromQuickConnectArn() {
-        assertThat(BaseHandlerStd.getInstanceArnFromQuickConnectArn(QUICK_CONNECT_ARN)).isEqualTo(INSTANCE_ARN);
-    }
-
-    @Test
-    public void testIsValidQuickConnectArn_ValidArn() {
-        assertTrue(BaseHandlerStd.isValidQuickConnectArn(QUICK_CONNECT_ARN));
-    }
-
-    @Test
-    public void testIsValidQuickConnectArn_InvalidArn() {
-        assertFalse(BaseHandlerStd.isValidQuickConnectArn(INSTANCE_ARN));
-    }
-
-    @Test
-    public void testIsValidQuickConnectArn_InvalidNull() {
-        assertFalse(BaseHandlerStd.isValidQuickConnectArn(null));
     }
 }

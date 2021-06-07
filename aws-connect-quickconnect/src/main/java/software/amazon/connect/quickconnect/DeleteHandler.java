@@ -25,7 +25,7 @@ public class DeleteHandler extends BaseHandlerStd {
 
         logger.log(String.format("Invoked DeleteQuickConnectHandler with QuickConnect:%s", quickConnectArn));
 
-        if(!isValidQuickConnectArn(quickConnectArn)) {
+        if (!ArnHelper.isValidQuickConnectArn(quickConnectArn)) {
             throw new CfnNotFoundException(new CfnInvalidRequestException(String.format("%s is not a valid Quick Connect Arn", quickConnectArn)));
         }
 
@@ -38,7 +38,7 @@ public class DeleteHandler extends BaseHandlerStd {
     private DeleteQuickConnectRequest translateToDeleteQuickConnectRequest(final ResourceModel model) {
         return DeleteQuickConnectRequest
                 .builder()
-                .instanceId(getInstanceArnFromQuickConnectArn(model.getQuickConnectArn()))
+                .instanceId(ArnHelper.getInstanceArnFromQuickConnectArn(model.getQuickConnectArn()))
                 .quickConnectId(model.getQuickConnectArn())
                 .build();
     }

@@ -5,12 +5,10 @@ import lombok.NoArgsConstructor;
 import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
 import software.amazon.awssdk.core.retry.backoff.EqualJitterBackoffStrategy;
 import software.amazon.awssdk.core.retry.conditions.RetryCondition;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.connect.ConnectClient;
 import software.amazon.cloudformation.LambdaWrapper;
 import software.amazon.awssdk.core.retry.RetryPolicy;
 
-import java.net.URI;
 import java.time.Duration;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

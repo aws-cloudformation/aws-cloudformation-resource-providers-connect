@@ -42,7 +42,7 @@ public class UpdateHandler extends BaseHandlerStd {
 
         logger.log(String.format("Invoked UpdateQuickConnectHandler with QuickConnect:%s", desiredStateModel.getQuickConnectArn()));
 
-        if (StringUtils.isNotEmpty(desiredStateModel.getInstanceArn()) && !desiredStateModel.getInstanceArn().equals(previousStateModel.getInstanceArn())){
+        if (StringUtils.isNotEmpty(desiredStateModel.getInstanceArn()) && !desiredStateModel.getInstanceArn().equals(previousStateModel.getInstanceArn())) {
             throw new CfnInvalidRequestException("InstanceArn cannot be updated.");
         }
 
