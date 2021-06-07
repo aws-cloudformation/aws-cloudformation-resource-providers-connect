@@ -49,8 +49,8 @@ public class UpdateHandler extends BaseHandlerStd {
         return ProgressEvent.progress(request.getDesiredResourceState(), callbackContext)
                 .then(progress -> updateQuickConnectName(proxy, proxyClient, desiredStateModel, previousStateModel, progress, callbackContext, logger))
                 .then(progress -> updateQuickConnectConfig(proxy, proxyClient, desiredStateModel, previousStateModel, progress, callbackContext, logger))
-                .then(progress -> tagResource(proxy, proxyClient, desiredStateModel, tagsToAdd, progress, callbackContext, logger))
                 .then(progress -> unTagResource(proxy, proxyClient, desiredStateModel, tagsToRemove, progress, callbackContext, logger))
+                .then(progress -> tagResource(proxy, proxyClient, desiredStateModel, tagsToAdd, progress, callbackContext, logger))
                 .then(progress -> ProgressEvent.defaultSuccessHandler(desiredStateModel));
     }
 
