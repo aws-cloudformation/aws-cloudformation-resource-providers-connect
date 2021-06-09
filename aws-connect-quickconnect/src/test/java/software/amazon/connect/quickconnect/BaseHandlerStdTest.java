@@ -59,6 +59,8 @@ public class BaseHandlerStdTest {
     private static final String ACCESS_DENIED_ERROR_CODE = "AccessDeniedException";
     private static final String THROTTLING_ERROR_CODE = "TooManyRequestsException";
     private static final String CONNECT_EXCEPTION_ERROR_CODE = "ConnectException";
+    private static final String INVALID_PARAMETER_FOR_QUICK_CONNECT_TYPE_USER = "Invalid request provided: Invalid Parameter PhoneConfig for type USER";
+    private static final String QUICK_CONNECT_PHONE_CONFIG = "PhoneConfig";
 
     @Mock
     private ProxyClient<ConnectClient> proxyClient;
@@ -234,5 +236,12 @@ public class BaseHandlerStdTest {
                 .build();
         assertThrows(CfnInvalidRequestException.class, () ->
                 BaseHandlerStd.translateToQuickConnectConfig(resourceModel));
+    }
+
+    @Test
+    public void testRequireNullForType() {
+        CfnInvalidRequestException cfnInvalidRequestException = assertThrows(CfnInvalidRequestException.class, () ->
+                BaseHandlerStd.requireNullForType(PhoneNumberQuickConnectConfig.builder().build(), QUICK_CONNECT_PHONE_CONFIG, QuickConnectType.USER.toString()));
+        assertThat(INVALID_PARAMETER_FOR_QUICK_CONNECT_TYPE_USER).isEqualTo(cfnInvalidRequestException.getMessage());
     }
 }

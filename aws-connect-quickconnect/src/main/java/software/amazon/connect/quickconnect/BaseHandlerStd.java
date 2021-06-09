@@ -168,7 +168,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
         }
     }
 
-    private static void requireNullForType(final Object object, final String parameterName, final String type) {
+    protected static void requireNullForType(final Object object, final String parameterName, final String type) {
         if (Objects.nonNull(object)) {
             throw new CfnInvalidRequestException(String.format(INVALID_PARAMETER_FOR_TYPE, parameterName, type));
         }
