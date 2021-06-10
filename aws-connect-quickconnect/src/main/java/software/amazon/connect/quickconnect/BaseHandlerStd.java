@@ -32,6 +32,7 @@ import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
 public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
 
     private static final String MISSING_MANDATORY_PARAMETER = "Required parameter missing %s";
+    private static final String INVALID_PARAMETER_FOR_TYPE = "Invalid Parameter %s for type %s";
     private static final String QUICK_CONNECT_USER_CONFIG = "UserConfig";
     private static final String QUICK_CONNECT_QUEUE_CONFIG = "QueueConfig";
     private static final String QUICK_CONNECT_PHONE_CONFIG = "PhoneConfig";
@@ -108,9 +110,12 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     protected static software.amazon.awssdk.services.connect.model.QuickConnectConfig translateToQuickConnectConfig(final ResourceModel model) {
         final String quickConnectType = model.getQuickConnectConfig().getQuickConnectType();
         if (quickConnectType.equals(QuickConnectType.USER.toString())) {
+            requireNullForType(model.getQuickConnectConfig().getPhoneConfig(), QUICK_CONNECT_PHONE_CONFIG, quickConnectType);
+            requireNullForType(model.getQuickConnectConfig().getQueueConfig(), QUICK_CONNECT_QUEUE_CONFIG, quickConnectType);
             requireNotNull(model.getQuickConnectConfig().getUserConfig(), QUICK_CONNECT_USER_CONFIG);
             requireNotNull(model.getQuickConnectConfig().getUserConfig().getUserArn(), USER_ID);
             requireNotNull(model.getQuickConnectConfig().getUserConfig().getContactFlowArn(), CONTACT_FLOW_ID);
+
             final software.amazon.awssdk.services.connect.model.UserQuickConnectConfig userQuickConnectConfig = UserQuickConnectConfig.builder()
                     .userId(model.getQuickConnectConfig().getUserConfig().getUserArn())
                     .contactFlowId(model.getQuickConnectConfig().getUserConfig().getContactFlowArn())
@@ -120,6 +125,8 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
                     .userConfig(userQuickConnectConfig)
                     .build();
         } else if (quickConnectType.equals(QuickConnectType.QUEUE.toString())) {
+            requireNullForType(model.getQuickConnectConfig().getPhoneConfig(), QUICK_CONNECT_PHONE_CONFIG, quickConnectType);
+            requireNullForType(model.getQuickConnectConfig().getUserConfig(), QUICK_CONNECT_USER_CONFIG, quickConnectType);
             requireNotNull(model.getQuickConnectConfig().getQueueConfig(), QUICK_CONNECT_QUEUE_CONFIG);
             requireNotNull(model.getQuickConnectConfig().getQueueConfig().getQueueArn(), QUEUE_ID);
             requireNotNull(model.getQuickConnectConfig().getQueueConfig().getContactFlowArn(), CONTACT_FLOW_ID);
@@ -132,6 +139,8 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
                     .queueConfig(queueQuickConnectConfig)
                     .build();
         } else if (quickConnectType.equals(QuickConnectType.PHONE_NUMBER.toString())) {
+            requireNullForType(model.getQuickConnectConfig().getQueueConfig(), QUICK_CONNECT_QUEUE_CONFIG, quickConnectType);
+            requireNullForType(model.getQuickConnectConfig().getUserConfig(), QUICK_CONNECT_USER_CONFIG, quickConnectType);
             requireNotNull(model.getQuickConnectConfig().getPhoneConfig(), QUICK_CONNECT_PHONE_CONFIG);
             requireNotNull(model.getQuickConnectConfig().getPhoneConfig().getPhoneNumber(), PHONE_NUMBER);
             final software.amazon.awssdk.services.connect.model.PhoneNumberQuickConnectConfig phoneNumberQuickConnectConfig = PhoneNumberQuickConnectConfig.builder()
@@ -154,8 +163,14 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     }
 
     protected static void requireNotNull(final Object object, final String parameterName) {
-        if (object == null) {
+        if (Objects.isNull(object)) {
             throw new CfnInvalidRequestException(String.format(MISSING_MANDATORY_PARAMETER, parameterName));
+        }
+    }
+
+    protected static void requireNullForType(final Object object, final String parameterName, final String type) {
+        if (Objects.nonNull(object)) {
+            throw new CfnInvalidRequestException(String.format(INVALID_PARAMETER_FOR_TYPE, parameterName, type));
         }
     }
 }
