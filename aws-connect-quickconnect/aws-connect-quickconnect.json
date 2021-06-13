@@ -15,7 +15,7 @@
     "PhoneNumber": {
       "description": "The phone number in E.164 format.",
       "type": "string",
-      "pattern": "^\\+?[1-9]\\d{1,14}$"
+      "pattern": "^\\+[1-9]\\d{1,14}$"
     },
     "ContactFlowArn": {
       "description": "The identifier of the contact flow.",
