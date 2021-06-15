@@ -26,7 +26,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 The phone number in E.164 format.
 
-_Required_: No
+_Required_: Yes
 
 _Type_: String
 
