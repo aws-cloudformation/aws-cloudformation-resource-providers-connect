@@ -572,6 +572,54 @@ public class UpdateHandlerTest {
     }
 
     @Test
+    public void testHandleRequest_Success_UpdateDescriptionNull() {
+
+        final QuickConnectConfig quickConnectConfigTypePhoneNumber = QuickConnectConfig
+                .builder()
+                .quickConnectType(QuickConnectType.PHONE_NUMBER.toString())
+                .phoneConfig(getPhoneQuickConnectConfig())
+                .build();
+
+        final ResourceModel desiredResourceModel = ResourceModel.builder()
+                .quickConnectArn(QUICK_CONNECT_ARN)
+                .instanceArn(INSTANCE_ARN)
+                .name(QUICK_CONNECT_NAME_THREE)
+                .description(null)
+                .quickConnectConfig(quickConnectConfigTypePhoneNumber)
+                .tags(TAGS_SET_ONE)
+                .build();
+
+        final ArgumentCaptor<UpdateQuickConnectNameRequest> updateQuickConnectNameRequestArgumentCaptor = ArgumentCaptor.forClass(UpdateQuickConnectNameRequest.class);
+
+        final UpdateQuickConnectNameResponse updateQuickConnectNameResponse = UpdateQuickConnectNameResponse.builder().build();
+        when(proxyClient.client().updateQuickConnectName(updateQuickConnectNameRequestArgumentCaptor.capture())).thenReturn(updateQuickConnectNameResponse);
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(desiredResourceModel)
+                .previousResourceState(buildQuickConnectResourceModelWithQuickConnectTypePhoneNumber())
+                .desiredResourceTags(TAGS_ONE)
+                .previousResourceTags(TAGS_ONE)
+                .build();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackContext()).isNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel()).isEqualTo(request.getDesiredResourceState());
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
+
+        verify(proxyClient.client()).updateQuickConnectName(updateQuickConnectNameRequestArgumentCaptor.capture());
+        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
+        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().quickConnectId()).isEqualTo(QUICK_CONNECT_ARN);
+        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().name()).isEqualTo(QUICK_CONNECT_NAME_THREE);
+        assertThat(updateQuickConnectNameRequestArgumentCaptor.getValue().description()).isEqualTo("");
+    }
+
+    @Test
     public void testHandleRequest_Success_UpdateUserQuickConnect_UserID() {
 
         final QuickConnectConfig quickConnectConfigTypeUser = QuickConnectConfig

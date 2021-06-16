@@ -84,7 +84,7 @@ public class UpdateHandler extends BaseHandlerStd {
                 .instanceId(model.getInstanceArn())
                 .quickConnectId(model.getQuickConnectArn())
                 .name(model.getName())
-                .description(model.getDescription())
+                .description(model.getDescription() == null ? "" : model.getDescription())
                 .build();
     }
 
