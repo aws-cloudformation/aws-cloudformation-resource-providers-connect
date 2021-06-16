@@ -28,7 +28,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 The identifier of the contact flow.
 
-_Required_: No
+_Required_: Yes
 
 _Type_: String
 
@@ -40,7 +40,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 The identifier for the queue.
 
-_Required_: No
+_Required_: Yes
 
 _Type_: String
 

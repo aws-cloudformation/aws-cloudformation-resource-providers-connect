@@ -44,11 +44,9 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 The value for the tag. You can specify a value that is maximum of 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
 
-_Required_: No
+_Required_: Yes
 
 _Type_: String
-
-_Minimum_: <code>1</code>
 
 _Maximum_: <code>256</code>
 
