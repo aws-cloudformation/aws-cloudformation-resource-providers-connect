@@ -19,12 +19,6 @@
     </properties>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/connect -->
-        <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>connect</artifactId>
-            <version>9.9.9</version>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/software.amazon.cloudformation/aws-cloudformation-rpdk-java-plugin -->
         <dependency>
             <groupId>software.amazon.cloudformation</groupId>
