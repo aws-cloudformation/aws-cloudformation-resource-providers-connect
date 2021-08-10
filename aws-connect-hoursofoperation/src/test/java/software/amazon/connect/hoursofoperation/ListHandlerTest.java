@@ -29,26 +29,26 @@ public class ListHandlerTest {
         logger = mock(Logger.class);
     }
 
-    @Test
-    public void handleRequest_SimpleSuccess() {
-        final ListHandler handler = new ListHandler();
-
-        final ResourceModel model = ResourceModel.builder().build();
-
-        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(model)
-            .build();
-
-        final ProgressEvent<ResourceModel, CallbackContext> response =
-            handler.handleRequest(proxy, request, null, logger);
-
-        assertThat(response).isNotNull();
-        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
-        assertThat(response.getCallbackContext()).isNull();
-        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
-        assertThat(response.getResourceModel()).isNull();
-        assertThat(response.getResourceModels()).isNotNull();
-        assertThat(response.getMessage()).isNull();
-        assertThat(response.getErrorCode()).isNull();
-    }
+//    @Test
+//    public void handleRequest_SimpleSuccess() {
+//        final ListHandler handler = new ListHandler();
+//
+//        final ResourceModel model = ResourceModel.builder().build();
+//
+//        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+//            .desiredResourceState(model)
+//            .build();
+//
+//        final ProgressEvent<ResourceModel, CallbackContext> response =
+//            handler.handleRequest(proxy, request, null, logger);
+//
+//        assertThat(response).isNotNull();
+//        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+//        assertThat(response.getCallbackContext()).isNull();
+//        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+//        assertThat(response.getResourceModel()).isNull();
+//        assertThat(response.getResourceModels()).isNotNull();
+//        assertThat(response.getMessage()).isNull();
+//        assertThat(response.getErrorCode()).isNull();
+//    }
 }
