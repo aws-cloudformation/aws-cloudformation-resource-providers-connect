@@ -21,10 +21,10 @@ public class HoursOfOperationTestDataProvider {
     protected static final String HOURS_OF_OPERATION_DESCRIPTION_TWO = "hoursDescriptionTwo";
     protected static final String HOURS_OF_OPERATION_NAME_THREE = "hoursNameThree";
     protected static final String HOURS_OF_OPERATION_DESCRIPTION_THREE = "hoursDescriptionThree";
-    protected static final String HOURS_ONE = "12";
-    protected static final String MINUTES_ONE = "30";
-    protected static final String HOURS_TWO = "10";
-    protected static final String MINUTES_TWO = "50";
+    protected static final Integer HOURS_ONE = 12;
+    protected static final Integer MINUTES_ONE = 30;
+    protected static final Integer HOURS_TWO = 10;
+    protected static final Integer MINUTES_TWO = 50;
     protected static final String DAY_ONE = "MONDAY";
     protected static final String DAY_TWO = "TUESDAY";
     protected static final String DAY_THREE = "FRIDAY";
@@ -120,11 +120,11 @@ public class HoursOfOperationTestDataProvider {
                 .build();
     }
 
-    private static software.amazon.awssdk.services.connect.model.HoursOfOperationTimeSlice getHoursOfOperationTimeSlices(String hours, String minutes) {
+    private static software.amazon.awssdk.services.connect.model.HoursOfOperationTimeSlice getHoursOfOperationTimeSlices(final int hours,final int minutes) {
 
         return software.amazon.awssdk.services.connect.model.HoursOfOperationTimeSlice.builder()
-                .hours(Integer.parseInt(hours))
-                .minutes(Integer.parseInt(minutes))
+                .hours(hours)
+                .minutes(minutes)
                 .build();
     }
 
@@ -135,7 +135,7 @@ public class HoursOfOperationTestDataProvider {
         return hoursOfOperationConfigSet;
     }
 
-    private static HoursOfOperationTimeSlice getHoursOfOperationTimeSLice(String hours, String minutes) {
+    private static HoursOfOperationTimeSlice getHoursOfOperationTimeSLice(final int hours, final int minutes) {
         return HoursOfOperationTimeSlice.builder()
                 .hours(hours)
                 .minutes(minutes)

@@ -128,10 +128,10 @@ public class CreateHandlerTest {
         int index = 0;
         for (software.amazon.connect.hoursofoperation.HoursOfOperationConfig config : getConfig()) {
             assertThat(hoursOfOperationConfig.get(index).day().toString()).isEqualTo(config.getDay());
-            assertThat(hoursOfOperationConfig.get(index).startTime().hours().toString()).isEqualTo(config.getStartTime().getHours());
-            assertThat(hoursOfOperationConfig.get(index).startTime().minutes().toString()).isEqualTo(config.getStartTime().getMinutes());
-            assertThat(hoursOfOperationConfig.get(index).endTime().hours().toString()).isEqualTo(config.getEndTime().getHours());
-            assertThat(hoursOfOperationConfig.get(index).endTime().minutes().toString()).isEqualTo(config.getEndTime().getMinutes());
+            assertThat(hoursOfOperationConfig.get(index).startTime().hours()).isEqualTo(config.getStartTime().getHours());
+            assertThat(hoursOfOperationConfig.get(index).startTime().minutes()).isEqualTo(config.getStartTime().getMinutes());
+            assertThat(hoursOfOperationConfig.get(index).endTime().hours()).isEqualTo(config.getEndTime().getHours());
+            assertThat(hoursOfOperationConfig.get(index).endTime().minutes()).isEqualTo(config.getEndTime().getMinutes());
             index += 1;
         }
     }

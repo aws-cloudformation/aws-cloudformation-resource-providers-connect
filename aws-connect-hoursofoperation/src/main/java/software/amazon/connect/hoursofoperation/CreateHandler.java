@@ -48,5 +48,4 @@ public class CreateHandler extends BaseHandlerStd {
         model.setHoursOfOperationArn(createHoursOfOperationResponse.hoursOfOperationArn());
         return model;
     }
-
 }

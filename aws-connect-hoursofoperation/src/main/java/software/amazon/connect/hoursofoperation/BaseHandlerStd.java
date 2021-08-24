@@ -30,7 +30,6 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import java.util.Set;
 import java.util.List;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ArrayList;
@@ -42,14 +41,10 @@ import java.util.stream.Collectors;
 public abstract class BaseHandlerStd extends BaseHandler<CallbackContext>  {
     private static final String MISSING_MANDATORY_PARAMETER = "Required parameter missing %s";
     private static final String INVALID_PARAMETER_FOR_TYPE = "Invalid Parameter %s for type %s";
-    private static final String QUICK_CONNECT_USER_CONFIG = "UserConfig";
-    private static final String QUICK_CONNECT_QUEUE_CONFIG = "QueueConfig";
-    private static final String QUICK_CONNECT_PHONE_CONFIG = "PhoneConfig";
     private static final String HOURS_OF_OPERATION_ID = "HoursOfOperationId";
 
     private static final String ACCESS_DENIED_ERROR_CODE = "AccessDeniedException";
     private static final String THROTTLING_ERROR_CODE = "TooManyRequestsException";
-    private static final String INVALID_QUICK_CONNECT_TYPE = "Invalid QuickConnectType: %s";
 
 
     @Override
@@ -106,7 +101,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext>  {
     }
 
     protected static List<software.amazon.awssdk.services.connect.model.HoursOfOperationConfig> translateToHoursOfOperationConfig(final ResourceModel model) {
-        List<software.amazon.awssdk.services.connect.model.HoursOfOperationConfig> hoursOfOperationConfigList = new ArrayList<>();
+        final List<software.amazon.awssdk.services.connect.model.HoursOfOperationConfig> hoursOfOperationConfigList = new ArrayList<>();
         for (HoursOfOperationConfig hoursOfOperationConfig : model.getConfig()) {
             hoursOfOperationConfigList.add(
                     software.amazon.awssdk.services.connect.model.HoursOfOperationConfig.builder()
@@ -119,36 +114,13 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext>  {
         return hoursOfOperationConfigList;
     }
 
-    private static HoursOfOperationTimeSlice toHoursOfOperationTimeSlice(software.amazon.connect.hoursofoperation.HoursOfOperationTimeSlice time) {
-        HoursOfOperationTimeSlice hoursOfOperationTimeSlice = HoursOfOperationTimeSlice.builder()
-                .hours(Integer.parseInt(time.getHours()))
-                .minutes(Integer.parseInt(time.getMinutes()))
-                .build();
-        return hoursOfOperationTimeSlice;
-    }
-
-
-    protected Set<HoursOfOperationConfig> toHoursOfOperationConfig(List<software.amazon.awssdk.services.connect.model.HoursOfOperationConfig> hoursOfOperationConfig) {
-        Set<HoursOfOperationConfig> hoursOfOperationConfigSet = new HashSet<>();
+    protected Set<HoursOfOperationConfig> translateToResourceModelConfig(final List<software.amazon.awssdk.services.connect.model.HoursOfOperationConfig> hoursOfOperationConfig) {
+        final Set<HoursOfOperationConfig> hoursOfOperationConfigSet = new HashSet<>();
         for (software.amazon.awssdk.services.connect.model.HoursOfOperationConfig  config : hoursOfOperationConfig){
-            hoursOfOperationConfigSet.add(toHoursOfOperationConfigs(config));
+            hoursOfOperationConfigSet.add(translateToResourceModelHoursOfOperationConfig(config));
 
         }
         return hoursOfOperationConfigSet;
-    }
-
-    private HoursOfOperationConfig toHoursOfOperationConfigs(software.amazon.awssdk.services.connect.model.HoursOfOperationConfig config) {
-        return HoursOfOperationConfig.builder()
-                .day(config.day().toString())
-                .startTime(toHoursOfOperationTimeSlices(config.startTime()))
-                .build();
-    }
-
-    private software.amazon.connect.hoursofoperation.HoursOfOperationTimeSlice toHoursOfOperationTimeSlices(HoursOfOperationTimeSlice time) {
-        return software.amazon.connect.hoursofoperation.HoursOfOperationTimeSlice.builder()
-                .hours(time.hours().toString())
-                .minutes(time.minutes().toString())
-                .build();
     }
 
     protected static Set<Tag> convertResourceTagsToSet(final Map<String, String> resourceTags) {
@@ -169,5 +141,28 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext>  {
         if (Objects.nonNull(object)) {
             throw new CfnInvalidRequestException(String.format(INVALID_PARAMETER_FOR_TYPE, parameterName, type));
         }
+    }
+
+    private HoursOfOperationConfig translateToResourceModelHoursOfOperationConfig(final software.amazon.awssdk.services.connect.model.HoursOfOperationConfig config) {
+        return HoursOfOperationConfig.builder()
+                .day(config.day().toString())
+                .startTime(toHoursOfOperationTimeSlices(config.startTime()))
+                .endTime(toHoursOfOperationTimeSlices(config.endTime()))
+                .build();
+    }
+
+    private software.amazon.connect.hoursofoperation.HoursOfOperationTimeSlice toHoursOfOperationTimeSlices(final HoursOfOperationTimeSlice time) {
+        return software.amazon.connect.hoursofoperation.HoursOfOperationTimeSlice.builder()
+                .hours(time.hours())
+                .minutes(time.minutes())
+                .build();
+    }
+
+    private static HoursOfOperationTimeSlice toHoursOfOperationTimeSlice(final software.amazon.connect.hoursofoperation.HoursOfOperationTimeSlice time) {
+        HoursOfOperationTimeSlice hoursOfOperationTimeSlice = HoursOfOperationTimeSlice.builder()
+                .hours(time.getHours())
+                .minutes(time.getMinutes())
+                .build();
+        return hoursOfOperationTimeSlice;
     }
 }

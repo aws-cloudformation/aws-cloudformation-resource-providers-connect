@@ -9,16 +9,16 @@
             "additionalProperties": false,
             "properties": {
                 "Hours": {
-                    "type": "string",
+                    "type": "integer",
                     "description": "The hours.",
-                    "minLength": 0,
-                    "maxLength": 23
+                    "minimum": 0,
+                    "maximum": 23
                 },
                 "Minutes": {
-                    "type": "string",
+                    "type": "integer",
                     "description": "The minutes.",
-                    "minLength": 0,
-                    "maxLength": 59
+                    "minimum": 0,
+                    "maximum": 59
                 }
             },
             "required": [
@@ -44,21 +44,21 @@
                         "SATURDAY"
                     ]
                 },
-                "EndTime": {
-                    "type": "string",
-                    "description": "The end time that your contact center is closes.",
-                    "$ref": "#/definitions/HoursOfOperationTimeSlice"
-                },
                 "StartTime": {
                     "type": "string",
                     "description": "The start time that your contact center is open.",
+                    "$ref": "#/definitions/HoursOfOperationTimeSlice"
+                },
+                "EndTime": {
+                    "type": "string",
+                    "description": "The end time that your contact center is closes.",
                     "$ref": "#/definitions/HoursOfOperationTimeSlice"
                 }
             },
             "required": [
                 "Day",
-                "EndTime",
-                "StartTime"
+                "StartTime",
+                "EndTime"
             ]
         },
         "Tag": {
@@ -125,7 +125,7 @@
         "Tags": {
             "description": "One or more tags.",
             "type": "array",
-            "maxItems": 200,
+            "maxItems": 50,
             "uniqueItems": true,
             "insertionOrder": false,
             "items": {

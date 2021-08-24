@@ -51,8 +51,7 @@ public class ReadHandler extends BaseHandlerStd {
         model.setName(model.getName());
         model.setDescription(model.getDescription());
         model.setTags(convertResourceTagsToSet(hoursOfOperation.tags()));
-        model.setConfig(toHoursOfOperationConfig(hoursOfOperation.config()));
+        model.setConfig(translateToResourceModelConfig(hoursOfOperation.config()));
         return model;
     }
-
 }
