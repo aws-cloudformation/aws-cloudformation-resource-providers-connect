@@ -24,6 +24,3 @@ sam-tests/
 
 # contract tests
 inputs/
-
-#resources
-src/resources/
