@@ -6,7 +6,6 @@ import org.mockito.ArgumentCaptor;
 import software.amazon.awssdk.services.connect.ConnectClient;
 import software.amazon.awssdk.services.connect.model.CreateHoursOfOperationRequest;
 import software.amazon.awssdk.services.connect.model.CreateHoursOfOperationResponse;
-import software.amazon.awssdk.services.connect.model.HoursOfOperationConfig;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,23 +20,25 @@ import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import java.time.Duration;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.HOURS_OF_OPERATION_NAME_ONE;
+import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.HOURS_OF_OPERATION_ARN;
+import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.HOURS_OF_OPERATION_CONFIG_ONE;
+import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.HOURS_OF_OPERATION_CONFIG_TWO;
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.HOURS_OF_OPERATION_DESCRIPTION_ONE;
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.HOURS_OF_OPERATION_ID;
-import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.HOURS_OF_OPERATION_ARN;
+import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.HOURS_OF_OPERATION_NAME_ONE;
+import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.INSTANCE_ARN;
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.TAGS_ONE;
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.TIME_ZONE_ONE;
-import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.INSTANCE_ARN;
-import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.buildHoursOfOperationResourceModel;
+import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.buildHoursOfOperationDesiredStateResourceModel;
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.getConfig;
+import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.validateConfig;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateHandlerTest {
@@ -61,7 +62,7 @@ public class CreateHandlerTest {
 
     @AfterEach
     public void post_execute() {
-        verify(connectClient, atLeastOnce()).serviceName();
+        verify(connectClient, times(1)).serviceName();
         verifyNoMoreInteractions(proxyClient.client());
     }
 
@@ -76,7 +77,7 @@ public class CreateHandlerTest {
         when(proxyClient.client().createHoursOfOperation(createHoursOfOperationRequestArgumentCaptor.capture())).thenReturn(createHoursOfOperationResponse);
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                .desiredResourceState(buildHoursOfOperationResourceModel())
+                .desiredResourceState(buildHoursOfOperationDesiredStateResourceModel())
                 .desiredResourceTags(TAGS_ONE)
                 .build();
 
@@ -95,7 +96,7 @@ public class CreateHandlerTest {
         assertThat(createHoursOfOperationRequestArgumentCaptor.getValue().name()).isEqualTo(HOURS_OF_OPERATION_NAME_ONE);
         assertThat(createHoursOfOperationRequestArgumentCaptor.getValue().description()).isEqualTo(HOURS_OF_OPERATION_DESCRIPTION_ONE);
         assertThat(createHoursOfOperationRequestArgumentCaptor.getValue().timeZone()).isEqualTo(TIME_ZONE_ONE);
-        assertThat(createHoursOfOperationRequestArgumentCaptor.getValue().config().size()).isEqualTo(getConfig().size());
+        assertThat(createHoursOfOperationRequestArgumentCaptor.getValue().config().size()).isEqualTo(getConfig(HOURS_OF_OPERATION_CONFIG_ONE, HOURS_OF_OPERATION_CONFIG_TWO).size());
         validateConfig(createHoursOfOperationRequestArgumentCaptor.getValue().config());
         assertThat(createHoursOfOperationRequestArgumentCaptor.getValue().tags()).isEqualTo(TAGS_ONE);
     }
@@ -107,7 +108,7 @@ public class CreateHandlerTest {
         when(proxyClient.client().createHoursOfOperation(createHoursOfOperationRequestArgumentCaptor.capture())).thenThrow(new RuntimeException());
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                .desiredResourceState(buildHoursOfOperationResourceModel())
+                .desiredResourceState(buildHoursOfOperationDesiredStateResourceModel())
                 .desiredResourceTags(TAGS_ONE)
                 .build();
 
@@ -119,20 +120,8 @@ public class CreateHandlerTest {
         assertThat(createHoursOfOperationRequestArgumentCaptor.getValue().name()).isEqualTo(HOURS_OF_OPERATION_NAME_ONE);
         assertThat(createHoursOfOperationRequestArgumentCaptor.getValue().description()).isEqualTo(HOURS_OF_OPERATION_DESCRIPTION_ONE);
         assertThat(createHoursOfOperationRequestArgumentCaptor.getValue().timeZone()).isEqualTo(TIME_ZONE_ONE);
-        assertThat(createHoursOfOperationRequestArgumentCaptor.getValue().config().size()).isEqualTo(getConfig().size());
+        assertThat(createHoursOfOperationRequestArgumentCaptor.getValue().config().size()).isEqualTo(getConfig(HOURS_OF_OPERATION_CONFIG_ONE, HOURS_OF_OPERATION_CONFIG_TWO).size());
         validateConfig(createHoursOfOperationRequestArgumentCaptor.getValue().config());
         assertThat(createHoursOfOperationRequestArgumentCaptor.getValue().tags()).isEqualTo(TAGS_ONE);
-    }
-
-    private void validateConfig(List<HoursOfOperationConfig> hoursOfOperationConfig) {
-        int index = 0;
-        for (software.amazon.connect.hoursofoperation.HoursOfOperationConfig config : getConfig()) {
-            assertThat(hoursOfOperationConfig.get(index).day().toString()).isEqualTo(config.getDay());
-            assertThat(hoursOfOperationConfig.get(index).startTime().hours()).isEqualTo(config.getStartTime().getHours());
-            assertThat(hoursOfOperationConfig.get(index).startTime().minutes()).isEqualTo(config.getStartTime().getMinutes());
-            assertThat(hoursOfOperationConfig.get(index).endTime().hours()).isEqualTo(config.getEndTime().getHours());
-            assertThat(hoursOfOperationConfig.get(index).endTime().minutes()).isEqualTo(config.getEndTime().getMinutes());
-            index += 1;
-        }
     }
 }

@@ -23,7 +23,7 @@ public class DeleteHandler extends BaseHandlerStd {
         final ResourceModel model = request.getDesiredResourceState();
         final String hoursOfOperationArn = model.getHoursOfOperationArn();
 
-        logger.log(String.format("Invoked DeleteHoursOfOperationHandler with HoursOfOperation:%s", hoursOfOperationArn));
+        logger.log(String.format("Invoked DeleteHoursOfOperationHandler with HoursOfOperationArn:%s", hoursOfOperationArn));
 
         if (!ArnHelper.isValidHoursOfOperationArn(hoursOfOperationArn)) {
             throw new CfnNotFoundException(new CfnInvalidRequestException(String.format("%s is not a valid Hours Of Operation Arn", hoursOfOperationArn)));

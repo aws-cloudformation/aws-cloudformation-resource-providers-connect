@@ -136,7 +136,8 @@
     "required": [
         "InstanceArn",
         "Name",
-        "TimeZone"
+        "TimeZone",
+        "Config"
     ],
     "handlers": {
         "create": {

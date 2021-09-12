@@ -20,10 +20,11 @@ public class CreateHandler extends BaseHandlerStd {
             final CallbackContext callbackContext,
             final ProxyClient<ConnectClient> proxyClient,
             final Logger logger) {
+
         final ResourceModel model = request.getDesiredResourceState();
         final Map<String, String> tags = request.getDesiredResourceTags();
 
-        logger.log(String.format("Invoked CreateHoursOfOperationHandler with InstanceId:%s ", model.getInstanceArn()));
+        logger.log(String.format("Invoked CreateHoursOfOperationHandler with InstanceArn:%s ", model.getInstanceArn()));
 
         return proxy.initiate("connect::createHoursOfOperation", proxyClient, model, callbackContext)
                 .translateToServiceRequest(resourceModel -> translateToCreateHoursOfOperationRequest(resourceModel, tags))
@@ -38,9 +39,9 @@ public class CreateHandler extends BaseHandlerStd {
                 .instanceId(model.getInstanceArn())
                 .name(model.getName())
                 .description(model.getDescription())
-                .tags(tags)
                 .config(translateToHoursOfOperationConfig(model))
                 .timeZone(model.getTimeZone())
+                .tags(tags)
                 .build();
     }
 

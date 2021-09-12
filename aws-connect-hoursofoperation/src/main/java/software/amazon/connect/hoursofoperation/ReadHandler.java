@@ -11,6 +11,10 @@ import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 
 public class ReadHandler extends BaseHandlerStd {
 
@@ -53,5 +57,21 @@ public class ReadHandler extends BaseHandlerStd {
         model.setTags(convertResourceTagsToSet(hoursOfOperation.tags()));
         model.setConfig(translateToResourceModelConfig(hoursOfOperation.config()));
         return model;
+    }
+
+    private Set<HoursOfOperationConfig> translateToResourceModelConfig(final List<software.amazon.awssdk.services.connect.model.HoursOfOperationConfig> hoursOfOperationConfig) {
+        final Set<HoursOfOperationConfig> hoursOfOperationConfigSet = new HashSet<>();
+        for (software.amazon.awssdk.services.connect.model.HoursOfOperationConfig config : hoursOfOperationConfig) {
+            hoursOfOperationConfigSet.add(translateToResourceModelHoursOfOperationConfig(config));
+        }
+        return hoursOfOperationConfigSet;
+    }
+
+    private HoursOfOperationConfig translateToResourceModelHoursOfOperationConfig(final software.amazon.awssdk.services.connect.model.HoursOfOperationConfig config) {
+        return HoursOfOperationConfig.builder()
+                .day(config.day().toString())
+                .startTime(translateToHoursOfOperationTimeSlices(config.startTime()))
+                .endTime(translateToHoursOfOperationTimeSlices(config.endTime()))
+                .build();
     }
 }

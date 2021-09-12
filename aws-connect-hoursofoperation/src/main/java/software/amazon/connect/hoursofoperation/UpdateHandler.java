@@ -37,7 +37,7 @@ public class UpdateHandler extends BaseHandlerStd {
         final Set<Tag> tagsToRemove = Sets.difference(previousResourceTags, desiredResourceTags);
         final Set<Tag> tagsToAdd = Sets.difference(desiredResourceTags, previousResourceTags);
 
-        logger.log(String.format("Invoked UpdateHoursOfOperationHandler with hoursOfOperation:%s", desiredStateModel.getHoursOfOperationArn()));
+        logger.log(String.format("Invoked UpdateHoursOfOperationHandler with HoursOfOperation:%s", desiredStateModel.getHoursOfOperationArn()));
 
         if (StringUtils.isNotEmpty(desiredStateModel.getInstanceArn()) && !desiredStateModel.getInstanceArn().equals(previousStateModel.getInstanceArn())) {
             throw new CfnInvalidRequestException("InstanceArn cannot be updated.");
@@ -55,7 +55,8 @@ public class UpdateHandler extends BaseHandlerStd {
                                                                                  final ResourceModel desiredStateModel,
                                                                                  final CallbackContext context,
                                                                                  final Logger logger) {
-        logger.log(String.format("Calling UpdateHoursOfOperation API for hoursOfOperation:%s", desiredStateModel.getHoursOfOperationArn()));
+
+        logger.log(String.format("Calling UpdateHoursOfOperation API for HoursOfOperation:%s", desiredStateModel.getHoursOfOperationArn()));
         return proxy.initiate("connect::updateHoursOfOperation", proxyClient, desiredStateModel, context)
                 .translateToServiceRequest(desired -> translateToUpdateHoursOfOperationRequest(desiredStateModel))
                 .makeServiceCall((req, clientProxy) -> invoke(req, clientProxy, clientProxy.client()::updateHoursOfOperation, logger))
