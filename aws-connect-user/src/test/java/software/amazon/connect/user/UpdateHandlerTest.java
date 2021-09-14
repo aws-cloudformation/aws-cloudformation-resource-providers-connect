@@ -24,6 +24,7 @@ import software.amazon.awssdk.services.connect.model.UpdateUserRoutingProfileReq
 import software.amazon.awssdk.services.connect.model.UpdateUserRoutingProfileResponse;
 
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
+import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Credentials;
 import software.amazon.cloudformation.proxy.LoggerProxy;
@@ -40,53 +41,51 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
 import software.amazon.cloudformation.proxy.Logger;
 
 import static org.mockito.Mockito.mock;
-import static software.amazon.connect.user.UserTestDataProvider.buildUserResourceModel1;
-import static software.amazon.connect.user.UserTestDataProvider.buildUserResourceModel;
-import static software.amazon.connect.user.UserTestDataProvider.USER_ARN;
-import static software.amazon.connect.user.UserTestDataProvider.FIRST_NAME;
-import static software.amazon.connect.user.UserTestDataProvider.LAST_NAME;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static software.amazon.connect.user.UserTestDataProvider.AFTER_CONTACT_WORK_TIME_LIMIT;
-import static software.amazon.connect.user.UserTestDataProvider.ROUTING_PROFILE_ARN;
-import static software.amazon.connect.user.UserTestDataProvider.SECURITY_PROFILE_ARN;
-import static software.amazon.connect.user.UserTestDataProvider.ROUTING_PROFILE_ARN_2;
-import static software.amazon.connect.user.UserTestDataProvider.HIERARCHY_GROUP_ARN;
-import static software.amazon.connect.user.UserTestDataProvider.HIERARCHY_GROUP_ARN_2;
-import static software.amazon.connect.user.UserTestDataProvider.SECURITY_PROFILE_ARN_2;
-import static software.amazon.connect.user.UserTestDataProvider.getUserIdentityInfo;
-import static software.amazon.connect.user.UserTestDataProvider.getUserPhoneConfig;
-import static software.amazon.connect.user.UserTestDataProvider.TAGS_ONE;
-import static software.amazon.connect.user.UserTestDataProvider.TAGS_SET_ONE;
-import static software.amazon.connect.user.UserTestDataProvider.TAGS_TWO;
-import static software.amazon.connect.user.UserTestDataProvider.TAGS_THREE;
-import static software.amazon.connect.user.UserTestDataProvider.VALID_TAG_KEY_THREE;
-import static software.amazon.connect.user.UserTestDataProvider.VALID_TAG_KEY_TWO;
-import static software.amazon.connect.user.UserTestDataProvider.EMAIL;
-import static software.amazon.connect.user.UserTestDataProvider.INSTANCE_ARN;
 import static software.amazon.connect.user.UserTestDataProvider.AUTO_ACCEPT;
+import static software.amazon.connect.user.UserTestDataProvider.DIRECTORY_USER_ID_TWO;
+import static software.amazon.connect.user.UserTestDataProvider.EMAIL;
+import static software.amazon.connect.user.UserTestDataProvider.FIRST_NAME;
+import static software.amazon.connect.user.UserTestDataProvider.FIRST_NAME_ONE;
+import static software.amazon.connect.user.UserTestDataProvider.HIERARCHY_GROUP_ARN;
+import static software.amazon.connect.user.UserTestDataProvider.HIERARCHY_GROUP_ARN_TWO;
+import static software.amazon.connect.user.UserTestDataProvider.INSTANCE_ARN;
+import static software.amazon.connect.user.UserTestDataProvider.INSTANCE_ARN_TWO;
+import static software.amazon.connect.user.UserTestDataProvider.LAST_NAME;
 import static software.amazon.connect.user.UserTestDataProvider.PHONE_NUMBER;
 import static software.amazon.connect.user.UserTestDataProvider.PHONE_TYPE_DESK;
 import static software.amazon.connect.user.UserTestDataProvider.PHONE_TYPE_SOFT;
+import static software.amazon.connect.user.UserTestDataProvider.ROUTING_PROFILE_ARN;
+import static software.amazon.connect.user.UserTestDataProvider.ROUTING_PROFILE_ARN_TWO;
+import static software.amazon.connect.user.UserTestDataProvider.SECURITY_PROFILE_ARN;
+import static software.amazon.connect.user.UserTestDataProvider.SECURITY_PROFILE_ARN_TWO;
+import static software.amazon.connect.user.UserTestDataProvider.TAGS_ONE;
+import static software.amazon.connect.user.UserTestDataProvider.TAGS_SET_ONE;
+import static software.amazon.connect.user.UserTestDataProvider.TAGS_THREE;
+import static software.amazon.connect.user.UserTestDataProvider.TAGS_TWO;
+import static software.amazon.connect.user.UserTestDataProvider.USER_ARN;
+import static software.amazon.connect.user.UserTestDataProvider.VALID_TAG_KEY_THREE;
+import static software.amazon.connect.user.UserTestDataProvider.VALID_TAG_KEY_TWO;
 import static software.amazon.connect.user.UserTestDataProvider.VALID_TAG_VALUE_THREE;
-import static software.amazon.connect.user.UserTestDataProvider.FIRST_NAME_ONE;
-
+import static software.amazon.connect.user.UserTestDataProvider.buildUserDesiredStateResourceModel;
+import static software.amazon.connect.user.UserTestDataProvider.buildUserPreviousStateResourceModel;
+import static software.amazon.connect.user.UserTestDataProvider.getUserIdentityInfo;
+import static software.amazon.connect.user.UserTestDataProvider.getUserPhoneConfig;
 
 @ExtendWith(MockitoExtension.class)
 public class UpdateHandlerTest {
 
     private UpdateHandler handler;
     private ProxyClient<ConnectClient> proxyClient;
-
-    private ResourceModel desiredQueueModel;
-    private ResourceModel currentUserModel;
-    private ResourceModel currentPhoneNumberModel;
 
     @Mock
     private AmazonWebServicesClientProxy proxy;
@@ -110,7 +109,6 @@ public class UpdateHandlerTest {
 
     @AfterEach
     public void post_execute() {
-        verify(connectClient, atLeastOnce()).serviceName();
         verifyNoMoreInteractions(proxyClient.client());
     }
 
@@ -135,7 +133,7 @@ public class UpdateHandlerTest {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(desiredResourceModel)
-                .previousResourceState(buildUserResourceModel())
+                .previousResourceState(buildUserDesiredStateResourceModel())
                 .desiredResourceTags(TAGS_ONE)
                 .previousResourceTags(TAGS_ONE)
                 .build();
@@ -157,6 +155,8 @@ public class UpdateHandlerTest {
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().firstName()).isEqualTo(updateFirstName);
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().lastName()).isEqualTo(LAST_NAME);
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().email()).isEqualTo(EMAIL);
+
+        verify(connectClient, times(1)).serviceName();
     }
 
     @Test
@@ -181,7 +181,7 @@ public class UpdateHandlerTest {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(desiredResourceModel)
-                .previousResourceState(buildUserResourceModel())
+                .previousResourceState(buildUserDesiredStateResourceModel())
                 .desiredResourceTags(TAGS_ONE)
                 .previousResourceTags(TAGS_ONE)
                 .build();
@@ -203,6 +203,8 @@ public class UpdateHandlerTest {
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().firstName()).isEqualTo(FIRST_NAME);
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().lastName()).isEqualTo(updateLastName);
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().email()).isEqualTo(EMAIL);
+
+        verify(connectClient, times(1)).serviceName();
     }
 
     @Test
@@ -227,7 +229,7 @@ public class UpdateHandlerTest {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(desiredResourceModel)
-                .previousResourceState(buildUserResourceModel())
+                .previousResourceState(buildUserDesiredStateResourceModel())
                 .desiredResourceTags(TAGS_ONE)
                 .previousResourceTags(TAGS_ONE)
                 .build();
@@ -249,6 +251,8 @@ public class UpdateHandlerTest {
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().firstName()).isEqualTo(FIRST_NAME);
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().lastName()).isEqualTo(LAST_NAME);
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().email()).isEqualTo(updateEmail);
+
+        verify(connectClient, times(1)).serviceName();
     }
 
     @Test
@@ -273,7 +277,7 @@ public class UpdateHandlerTest {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(desiredResourceModel)
-                .previousResourceState(buildUserResourceModel())
+                .previousResourceState(buildUserDesiredStateResourceModel())
                 .desiredResourceTags(TAGS_ONE)
                 .previousResourceTags(TAGS_ONE)
                 .build();
@@ -296,16 +300,17 @@ public class UpdateHandlerTest {
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().phoneConfig().autoAccept()).isEqualTo(Boolean.TRUE);
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().phoneConfig().phoneType().toString()).isEqualTo(PHONE_TYPE_DESK);
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().phoneConfig().deskPhoneNumber()).isEqualTo(PHONE_NUMBER);
+
+        verify(connectClient, times(1)).serviceName();
     }
 
     @Test
     public void testHandleRequest_Success_PhoneConfig_UpdateAutoAcceptOnly() {
-        final Boolean updateAutoAccept = Boolean.FALSE;
         final ResourceModel desiredResourceModel = ResourceModel.builder()
                 .userArn(USER_ARN)
                 .instanceArn(INSTANCE_ARN)
                 .identityInfo(getUserIdentityInfo())
-                .phoneConfig(getUserPhoneConfig(AFTER_CONTACT_WORK_TIME_LIMIT, updateAutoAccept, PHONE_NUMBER, PHONE_TYPE_DESK))
+                .phoneConfig(getUserPhoneConfig(AFTER_CONTACT_WORK_TIME_LIMIT, Boolean.FALSE, PHONE_NUMBER, PHONE_TYPE_DESK))
                 .securityProfileArns(Collections.singleton(SECURITY_PROFILE_ARN))
                 .routingProfileArn(ROUTING_PROFILE_ARN)
                 .hierarchyGroupArn(HIERARCHY_GROUP_ARN)
@@ -319,7 +324,7 @@ public class UpdateHandlerTest {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(desiredResourceModel)
-                .previousResourceState(buildUserResourceModel())
+                .previousResourceState(buildUserDesiredStateResourceModel())
                 .desiredResourceTags(TAGS_ONE)
                 .previousResourceTags(TAGS_ONE)
                 .build();
@@ -339,9 +344,11 @@ public class UpdateHandlerTest {
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().userId()).isEqualTo(USER_ARN);
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().phoneConfig().afterContactWorkTimeLimit()).isEqualTo(AFTER_CONTACT_WORK_TIME_LIMIT);
-        assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().phoneConfig().autoAccept()).isEqualTo(updateAutoAccept);
+        assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().phoneConfig().autoAccept()).isFalse();
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().phoneConfig().phoneType().toString()).isEqualTo(PHONE_TYPE_DESK);
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().phoneConfig().deskPhoneNumber()).isEqualTo(PHONE_NUMBER);
+
+        verify(connectClient, times(1)).serviceName();
     }
 
     @Test
@@ -366,7 +373,7 @@ public class UpdateHandlerTest {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(desiredResourceModel)
-                .previousResourceState(buildUserResourceModel())
+                .previousResourceState(buildUserDesiredStateResourceModel())
                 .desiredResourceTags(TAGS_ONE)
                 .previousResourceTags(TAGS_ONE)
                 .build();
@@ -389,6 +396,8 @@ public class UpdateHandlerTest {
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().phoneConfig().autoAccept()).isEqualTo(AUTO_ACCEPT);
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().phoneConfig().phoneType().toString()).isEqualTo(updatePhoneType);
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().phoneConfig().deskPhoneNumber()).isEqualTo(PHONE_NUMBER);
+
+        verify(connectClient, times(1)).serviceName();
     }
 
     @Test
@@ -413,7 +422,7 @@ public class UpdateHandlerTest {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(desiredResourceModel)
-                .previousResourceState(buildUserResourceModel())
+                .previousResourceState(buildUserDesiredStateResourceModel())
                 .desiredResourceTags(TAGS_ONE)
                 .previousResourceTags(TAGS_ONE)
                 .build();
@@ -436,11 +445,13 @@ public class UpdateHandlerTest {
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().phoneConfig().autoAccept()).isEqualTo(AUTO_ACCEPT);
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().phoneConfig().phoneType().toString()).isEqualTo(PHONE_TYPE_DESK);
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().phoneConfig().deskPhoneNumber()).isEqualTo(updatePhoneNumber);
+
+        verify(connectClient, times(1)).serviceName();
     }
 
     @Test
     public void testHandleRequest_Success_UpdateUserRoutingProfile() {
-        final String updateRoutingProfileArn = ROUTING_PROFILE_ARN_2;
+        final String updateRoutingProfileArn = ROUTING_PROFILE_ARN_TWO;
         final ResourceModel desiredResourceModel = ResourceModel.builder()
                 .userArn(USER_ARN)
                 .instanceArn(INSTANCE_ARN)
@@ -459,7 +470,7 @@ public class UpdateHandlerTest {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(desiredResourceModel)
-                .previousResourceState(buildUserResourceModel())
+                .previousResourceState(buildUserDesiredStateResourceModel())
                 .desiredResourceTags(TAGS_ONE)
                 .previousResourceTags(TAGS_ONE)
                 .build();
@@ -479,11 +490,13 @@ public class UpdateHandlerTest {
         assertThat(updateUserRoutingProfileRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateUserRoutingProfileRequestArgumentCaptor.getValue().userId()).isEqualTo(USER_ARN);
         assertThat(updateUserRoutingProfileRequestArgumentCaptor.getValue().routingProfileId()).isEqualTo(updateRoutingProfileArn);
+
+        verify(connectClient, times(1)).serviceName();
     }
 
     @Test
     public void testHandleRequest_Success_UpdateUserSecurityProfiles() {
-        final String updateSecurityProfileArn = SECURITY_PROFILE_ARN_2;
+        final String updateSecurityProfileArn = SECURITY_PROFILE_ARN_TWO;
         final ResourceModel desiredResourceModel = ResourceModel.builder()
                 .userArn(USER_ARN)
                 .instanceArn(INSTANCE_ARN)
@@ -502,7 +515,7 @@ public class UpdateHandlerTest {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(desiredResourceModel)
-                .previousResourceState(buildUserResourceModel())
+                .previousResourceState(buildUserDesiredStateResourceModel())
                 .desiredResourceTags(TAGS_ONE)
                 .previousResourceTags(TAGS_ONE)
                 .build();
@@ -523,11 +536,13 @@ public class UpdateHandlerTest {
         assertThat(updateUserSecurityProfilesRequestArgumentCaptor.getValue().userId()).isEqualTo(USER_ARN);
         assertThat(updateUserSecurityProfilesRequestArgumentCaptor.getValue().securityProfileIds().size()).isEqualTo(1);
         assertThat(updateUserSecurityProfilesRequestArgumentCaptor.getValue().securityProfileIds().get(0)).isEqualTo(updateSecurityProfileArn);
+
+        verify(connectClient, times(1)).serviceName();
     }
 
     @Test
     public void testHandleRequest_Success_UpdateUserHierarchy() {
-        final String updateUserHierarchy = HIERARCHY_GROUP_ARN_2;
+        final String updateUserHierarchy = HIERARCHY_GROUP_ARN_TWO;
         final ResourceModel desiredResourceModel = ResourceModel.builder()
                 .userArn(USER_ARN)
                 .instanceArn(INSTANCE_ARN)
@@ -546,7 +561,7 @@ public class UpdateHandlerTest {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(desiredResourceModel)
-                .previousResourceState(buildUserResourceModel())
+                .previousResourceState(buildUserDesiredStateResourceModel())
                 .desiredResourceTags(TAGS_ONE)
                 .previousResourceTags(TAGS_ONE)
                 .build();
@@ -566,6 +581,8 @@ public class UpdateHandlerTest {
         assertThat(updateUserHierarchyRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateUserHierarchyRequestArgumentCaptor.getValue().userId()).isEqualTo(USER_ARN);
         assertThat(updateUserHierarchyRequestArgumentCaptor.getValue().hierarchyGroupId()).isEqualTo(updateUserHierarchy);
+
+        verify(connectClient, times(1)).serviceName();
     }
 
     @Test
@@ -588,7 +605,7 @@ public class UpdateHandlerTest {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(desiredResourceModel)
-                .previousResourceState(buildUserResourceModel())
+                .previousResourceState(buildUserDesiredStateResourceModel())
                 .desiredResourceTags(TAGS_ONE)
                 .previousResourceTags(TAGS_ONE)
                 .build();
@@ -601,16 +618,17 @@ public class UpdateHandlerTest {
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().firstName()).isEqualTo(FIRST_NAME_ONE);
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().lastName()).isEqualTo(LAST_NAME);
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().email()).isEqualTo(EMAIL);
+
+        verify(connectClient, times(1)).serviceName();
     }
 
     @Test
     public void testHandleRequest_Exception_UpdateUserPhoneConfig() {
-        final Boolean updateAutoAccept = Boolean.FALSE;
         final ResourceModel desiredResourceModel = ResourceModel.builder()
                 .userArn(USER_ARN)
                 .instanceArn(INSTANCE_ARN)
                 .identityInfo(getUserIdentityInfo())
-                .phoneConfig(getUserPhoneConfig(AFTER_CONTACT_WORK_TIME_LIMIT, updateAutoAccept, PHONE_NUMBER, PHONE_TYPE_DESK))
+                .phoneConfig(getUserPhoneConfig(AFTER_CONTACT_WORK_TIME_LIMIT, Boolean.FALSE, PHONE_NUMBER, PHONE_TYPE_DESK))
                 .securityProfileArns(Collections.singleton(SECURITY_PROFILE_ARN))
                 .routingProfileArn(ROUTING_PROFILE_ARN)
                 .hierarchyGroupArn(HIERARCHY_GROUP_ARN)
@@ -622,7 +640,7 @@ public class UpdateHandlerTest {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(desiredResourceModel)
-                .previousResourceState(buildUserResourceModel())
+                .previousResourceState(buildUserDesiredStateResourceModel())
                 .desiredResourceTags(TAGS_ONE)
                 .previousResourceTags(TAGS_ONE)
                 .build();
@@ -633,14 +651,16 @@ public class UpdateHandlerTest {
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().userId()).isEqualTo(USER_ARN);
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().phoneConfig().afterContactWorkTimeLimit()).isEqualTo(AFTER_CONTACT_WORK_TIME_LIMIT);
-        assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().phoneConfig().autoAccept()).isEqualTo(updateAutoAccept);
+        assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().phoneConfig().autoAccept()).isFalse();
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().phoneConfig().phoneType().toString()).isEqualTo(PHONE_TYPE_DESK);
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().phoneConfig().deskPhoneNumber()).isEqualTo(PHONE_NUMBER);
+
+        verify(connectClient, times(1)).serviceName();
     }
 
     @Test
     public void testHandleRequest_Exception_UpdateUserRoutingProfile() {
-        final String updateRoutingProfileArn = ROUTING_PROFILE_ARN_2;
+        final String updateRoutingProfileArn = ROUTING_PROFILE_ARN_TWO;
         final ResourceModel desiredResourceModel = ResourceModel.builder()
                 .userArn(USER_ARN)
                 .instanceArn(INSTANCE_ARN)
@@ -657,7 +677,7 @@ public class UpdateHandlerTest {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(desiredResourceModel)
-                .previousResourceState(buildUserResourceModel())
+                .previousResourceState(buildUserDesiredStateResourceModel())
                 .desiredResourceTags(TAGS_ONE)
                 .previousResourceTags(TAGS_ONE)
                 .build();
@@ -668,11 +688,13 @@ public class UpdateHandlerTest {
         assertThat(updateUserRoutingProfileRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateUserRoutingProfileRequestArgumentCaptor.getValue().userId()).isEqualTo(USER_ARN);
         assertThat(updateUserRoutingProfileRequestArgumentCaptor.getValue().routingProfileId()).isEqualTo(updateRoutingProfileArn);
+
+        verify(connectClient, times(1)).serviceName();
     }
 
     @Test
     public void testHandleRequest_Exception_UpdateUserSecurityProfiles() {
-        final String updateSecurityProfileArn = SECURITY_PROFILE_ARN_2;
+        final String updateSecurityProfileArn = SECURITY_PROFILE_ARN_TWO;
         final ResourceModel desiredResourceModel = ResourceModel.builder()
                 .userArn(USER_ARN)
                 .instanceArn(INSTANCE_ARN)
@@ -690,7 +712,7 @@ public class UpdateHandlerTest {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(desiredResourceModel)
-                .previousResourceState(buildUserResourceModel())
+                .previousResourceState(buildUserDesiredStateResourceModel())
                 .desiredResourceTags(TAGS_ONE)
                 .previousResourceTags(TAGS_ONE)
                 .build();
@@ -702,11 +724,13 @@ public class UpdateHandlerTest {
         assertThat(updateUserSecurityProfilesRequestArgumentCaptor.getValue().userId()).isEqualTo(USER_ARN);
         assertThat(updateUserSecurityProfilesRequestArgumentCaptor.getValue().securityProfileIds().size()).isEqualTo(1);
         assertThat(updateUserSecurityProfilesRequestArgumentCaptor.getValue().securityProfileIds().get(0)).isEqualTo(updateSecurityProfileArn);
+
+        verify(connectClient, times(1)).serviceName();
     }
 
     @Test
     public void testHandleRequest_Exception_UpdateUserHierarchy() {
-        final String updateUserHierarchy = HIERARCHY_GROUP_ARN_2;
+        final String updateUserHierarchy = HIERARCHY_GROUP_ARN_TWO;
         final ResourceModel desiredResourceModel = ResourceModel.builder()
                 .userArn(USER_ARN)
                 .instanceArn(INSTANCE_ARN)
@@ -723,7 +747,7 @@ public class UpdateHandlerTest {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(desiredResourceModel)
-                .previousResourceState(buildUserResourceModel())
+                .previousResourceState(buildUserDesiredStateResourceModel())
                 .desiredResourceTags(TAGS_ONE)
                 .previousResourceTags(TAGS_ONE)
                 .build();
@@ -733,6 +757,8 @@ public class UpdateHandlerTest {
         assertThat(updateUserHierarchyRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(updateUserHierarchyRequestArgumentCaptor.getValue().userId()).isEqualTo(USER_ARN);
         assertThat(updateUserHierarchyRequestArgumentCaptor.getValue().hierarchyGroupId()).isEqualTo(updateUserHierarchy);
+
+        verify(connectClient, times(1)).serviceName();
     }
 
 
@@ -765,8 +791,8 @@ public class UpdateHandlerTest {
         when(proxyClient.client().tagResource(tagResourceRequestArgumentCaptor.capture())).thenThrow(new RuntimeException());
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                .desiredResourceState(buildUserResourceModel())
-                .previousResourceState(buildUserResourceModel1())
+                .desiredResourceState(buildUserDesiredStateResourceModel())
+                .previousResourceState(buildUserPreviousStateResourceModel())
                 .desiredResourceTags(TAGS_THREE)
                 .previousResourceTags(TAGS_ONE)
                 .build();
@@ -807,6 +833,8 @@ public class UpdateHandlerTest {
         verify(proxyClient.client()).tagResource(tagResourceRequestArgumentCaptor.capture());
         assertThat(tagResourceRequestArgumentCaptor.getValue().resourceArn()).isEqualTo(USER_ARN);
         assertThat(tagResourceRequestArgumentCaptor.getValue().tags()).isEqualTo(tagsAdded);
+
+        verify(connectClient, times(6)).serviceName();
     }
 
     @Test
@@ -837,8 +865,8 @@ public class UpdateHandlerTest {
         when(proxyClient.client().untagResource(untagResourceRequestArgumentCaptor.capture())).thenThrow(new RuntimeException());
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                .desiredResourceState(buildUserResourceModel())
-                .previousResourceState(buildUserResourceModel1())
+                .desiredResourceState(buildUserDesiredStateResourceModel())
+                .previousResourceState(buildUserPreviousStateResourceModel())
                 .desiredResourceTags(ImmutableMap.of())
                 .previousResourceTags(TAGS_TWO)
                 .build();
@@ -879,5 +907,39 @@ public class UpdateHandlerTest {
         verify(proxyClient.client()).untagResource(untagResourceRequestArgumentCaptor.capture());
         assertThat(untagResourceRequestArgumentCaptor.getValue().resourceArn()).isEqualTo(USER_ARN);
         assertThat(untagResourceRequestArgumentCaptor.getValue().tagKeys()).hasSameElementsAs(unTagKeys);
+
+        verify(connectClient, times(6)).serviceName();
+    }
+
+    @Test
+    public void testHandleRequest_CfnInvalidRequestException_UpdateInstanceArn() {
+        final ResourceModel model = buildUserDesiredStateResourceModel();
+        model.setInstanceArn(INSTANCE_ARN_TWO);
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .previousResourceState(buildUserPreviousStateResourceModel())
+                .desiredResourceTags(TAGS_ONE)
+                .previousResourceTags(TAGS_ONE)
+                .build();
+
+        assertThrows(CfnInvalidRequestException.class, () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+
+        verify(connectClient, never()).serviceName();
+    }
+
+    @Test
+    public void testHandleRequest_CfnInvalidRequestException_UpdateDirectoryUserId() {
+        final ResourceModel model = buildUserDesiredStateResourceModel();
+        model.setDirectoryUserId(DIRECTORY_USER_ID_TWO);
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .previousResourceState(buildUserPreviousStateResourceModel())
+                .desiredResourceTags(TAGS_ONE)
+                .previousResourceTags(TAGS_ONE)
+                .build();
+
+        assertThrows(CfnInvalidRequestException.class, () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+
+        verify(connectClient, never()).serviceName();
     }
 }

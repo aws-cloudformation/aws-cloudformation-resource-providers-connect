@@ -5,10 +5,26 @@ import org.apache.commons.lang3.StringUtils;
 import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.awscore.AwsResponse;
 import software.amazon.awssdk.services.connect.ConnectClient;
-import software.amazon.awssdk.services.connect.model.*;
+import software.amazon.awssdk.services.connect.model.ConnectException;
+import software.amazon.awssdk.services.connect.model.DuplicateResourceException;
+import software.amazon.awssdk.services.connect.model.InternalServiceException;
+import software.amazon.awssdk.services.connect.model.InvalidParameterException;
+import software.amazon.awssdk.services.connect.model.InvalidRequestException;
+import software.amazon.awssdk.services.connect.model.LimitExceededException;
 import software.amazon.awssdk.services.connect.model.ResourceNotFoundException;
-import software.amazon.cloudformation.exceptions.*;
-import software.amazon.cloudformation.proxy.*;
+import software.amazon.cloudformation.exceptions.CfnAccessDeniedException;
+import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
+import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
+import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
+import software.amazon.cloudformation.exceptions.CfnNotFoundException;
+import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
+import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
+import software.amazon.cloudformation.exceptions.CfnThrottlingException;
+import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.Logger;
+import software.amazon.cloudformation.proxy.ProgressEvent;
+import software.amazon.cloudformation.proxy.ProxyClient;
+import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import java.util.Map;
 import java.util.Optional;
@@ -77,13 +93,13 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
 
     protected static software.amazon.awssdk.services.connect.model.UserPhoneConfig translateToUserPhoneConfig(final ResourceModel model) {
 
-            return software.amazon.awssdk.services.connect.model.UserPhoneConfig.builder()
-                    .afterContactWorkTimeLimit(model.getPhoneConfig().getAfterContactWorkTimeLimit())
-                    .autoAccept(model.getPhoneConfig().getAutoAccept())
-                    .deskPhoneNumber(model.getPhoneConfig().getDeskPhoneNumber())
-                    .phoneType(model.getPhoneConfig().getPhoneType())
-                    .build();
-        }
+        return software.amazon.awssdk.services.connect.model.UserPhoneConfig.builder()
+                .afterContactWorkTimeLimit(model.getPhoneConfig().getAfterContactWorkTimeLimit())
+                .autoAccept(model.getPhoneConfig().getAutoAccept())
+                .deskPhoneNumber(model.getPhoneConfig().getDeskPhoneNumber())
+                .phoneType(model.getPhoneConfig().getPhoneType())
+                .build();
+    }
 
     protected static software.amazon.awssdk.services.connect.model.UserIdentityInfo translateToUserIdentityInfo(final ResourceModel model) {
 
@@ -101,5 +117,4 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
                         .collect(Collectors.toSet()))
                 .orElse(Sets.newHashSet());
     }
-
 }

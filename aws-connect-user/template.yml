@@ -21,4 +21,3 @@ Resources:
       Handler: software.amazon.connect.user.HandlerWrapper::testEntrypoint
       Runtime: java8
       CodeUri: ./target/aws-connect-user-handler-1.0-SNAPSHOT.jar
-

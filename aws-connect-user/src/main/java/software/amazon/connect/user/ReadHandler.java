@@ -13,6 +13,8 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import java.util.HashSet;
 
+import static java.util.stream.Collectors.toList;
+
 public class ReadHandler extends BaseHandlerStd {
 
     @Override
@@ -43,7 +45,7 @@ public class ReadHandler extends BaseHandlerStd {
     private DescribeUserRequest translateToDescribeUserRequest(final ResourceModel model) {
         return DescribeUserRequest
                 .builder()
-                .instanceId(ArnHelper.getInstanceArnFromUserArn(model.getInstanceArn()))
+                .instanceId(ArnHelper.getInstanceArnFromUserArn(model.getUserArn()))
                 .userId(model.getUserArn())
                 .build();
     }
@@ -52,9 +54,11 @@ public class ReadHandler extends BaseHandlerStd {
         final String instanceArn = ArnHelper.getInstanceArnFromUserArn(user.arn());
         model.setInstanceArn(instanceArn);
         model.setDirectoryUserId(user.directoryUserId());
-        model.setRoutingProfileArn(user.routingProfileId());
-        model.setHierarchyGroupArn(user.hierarchyGroupId());
-        model.setSecurityProfileArns(new HashSet<>(user.securityProfileIds()));
+        model.setRoutingProfileArn(ArnHelper.constructRoutingProfileArn(instanceArn, user.routingProfileId()));
+        model.setHierarchyGroupArn(ArnHelper.constructUserHierarchyGroupArn(instanceArn, user.hierarchyGroupId()));
+        model.setSecurityProfileArns(new HashSet<>(user.securityProfileIds().stream()
+                .map(securityProfileId -> ArnHelper.constructSecurityProfileArn(instanceArn, securityProfileId))
+                .collect(toList())));
         model.setUsername(user.username());
         model.setIdentityInfo(translateToResourceModelUserIdentityInfo(user.identityInfo()));
         model.setPhoneConfig(translateToResourceModelUserPhoneConfig(user.phoneConfig()));
@@ -62,7 +66,7 @@ public class ReadHandler extends BaseHandlerStd {
         return model;
     }
 
-    private software.amazon.connect.user.UserIdentityInfo translateToResourceModelUserIdentityInfo (final software.amazon.awssdk.services.connect.model.UserIdentityInfo userIdentityInfo){
+    private software.amazon.connect.user.UserIdentityInfo translateToResourceModelUserIdentityInfo(final software.amazon.awssdk.services.connect.model.UserIdentityInfo userIdentityInfo) {
         final software.amazon.connect.user.UserIdentityInfo resourceModelUserIdentityInfo = new software.amazon.connect.user.UserIdentityInfo();
         resourceModelUserIdentityInfo.setEmail(userIdentityInfo.email());
         resourceModelUserIdentityInfo.setFirstName(userIdentityInfo.firstName());
@@ -70,7 +74,7 @@ public class ReadHandler extends BaseHandlerStd {
         return resourceModelUserIdentityInfo;
     }
 
-    private software.amazon.connect.user.UserPhoneConfig translateToResourceModelUserPhoneConfig (final software.amazon.awssdk.services.connect.model.UserPhoneConfig userPhoneConfig){
+    private software.amazon.connect.user.UserPhoneConfig translateToResourceModelUserPhoneConfig(final software.amazon.awssdk.services.connect.model.UserPhoneConfig userPhoneConfig) {
         final software.amazon.connect.user.UserPhoneConfig resourceModelUserPhoneConfig = new software.amazon.connect.user.UserPhoneConfig();
         resourceModelUserPhoneConfig.setAfterContactWorkTimeLimit(userPhoneConfig.afterContactWorkTimeLimit());
         resourceModelUserPhoneConfig.setAutoAccept(userPhoneConfig.autoAccept());

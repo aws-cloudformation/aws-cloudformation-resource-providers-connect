@@ -9,15 +9,24 @@ import java.util.Map;
 import java.util.Set;
 
 public class UserTestDataProvider {
-
+    protected static final String USER_ARN = "arn:aws:connect:us-west-2:111111111111:instance/instanceId/agent/userID";
+    protected static final String INVALID_USER_ARN = "invalidUserArn";
+    protected static final String USER_ID = "userId";
     protected static final String INSTANCE_ARN = "arn:aws:connect:us-west-2:111111111111:instance/instanceId";
-    protected static final String ROUTING_PROFILE_ARN = "arn:aws:connect:us-west-2:768859163783:instance/e6c9d054-8058-4bd8-998b-fb5c148ce28c/routing-profile/6e40fa8d-a718-42b5-bd99-dfa7c4109a6e";
-    protected static final String ROUTING_PROFILE_ARN_2 = "arn:aws:connect:us-west-2:768859163783:instance/e6c9d054-8058-4bd8-998b-fb5c148ce28c/routing-profile/6e40fa8d-a718-42b5-bd99-dfa7c4109b9o";
-    protected static final String USER_ARN = "arn:aws:connect:us-west-2:768859163783:instance/a4db200b-d826-4c53-b226-a08d1300d34e/agent/11a6bd59-ef37-4117-a654-903aa6fede84";
-    protected static final String SECURITY_PROFILE_ARN = "arn:aws:connect:us-west-2:768859163783:instance/e6c9d054-8058-4bd8-998b-fb5c148ce28c/security-profile/551e8310-05af-45b5-ac7e-d380ccafa4c0";
-    protected static final String SECURITY_PROFILE_ARN_2 = "arn:aws:connect:us-west-2:768859163783:instance/e6c9d054-8058-4bd8-998b-fb5c148ce28c/security-profile/551e8310-05af-45b5-ac7e-d380ccafa4m9";
-    protected static final String HIERARCHY_GROUP_ARN = "arn:aws:connect:us-west-2:954356521827:instance/1e8dce9d-1e3b-41a5-a526-2d484a7d8488/agent-group/a1e457eb-4594-4fe4-9a67-d7d686ae0b09";
-    protected static final String HIERARCHY_GROUP_ARN_2 = "arn:aws:connect:us-west-2:954356521827:instance/1e8dce9d-1e3b-41a5-a526-2d484a7d8488/agent-group/a1e457eb-4594-4fe4-9a67-d7d686ae0c89";
+    protected static final String INSTANCE_ARN_TWO = "arn:aws:connect:us-west-2:111111111111:instance/instanceIdTwo";
+    protected static final String USERNAME = "username";
+    protected static final String USER_PASSWORD = "userPassword";
+    protected static final String DIRECTORY_USER_ID = "directoryUserId";
+    protected static final String DIRECTORY_USER_ID_TWO = "directoryUserId2";
+    protected static final String ROUTING_PROFILE_ID = "routingProfileId";
+    protected static final String ROUTING_PROFILE_ARN = "arn:aws:connect:us-west-2:111111111111:instance/instanceId/routing-profile/routingProfileId";
+    protected static final String ROUTING_PROFILE_ARN_TWO = "arn:aws:connect:us-west-2:111111111111:instance/instanceId/routing-profile/routingProfileId2";
+    protected static final String SECURITY_PROFILE_ID = "securityProfileId";
+    protected static final String SECURITY_PROFILE_ARN = "arn:aws:connect:us-west-2:111111111111:instance/instanceId/security-profile/securityProfileId";
+    protected static final String SECURITY_PROFILE_ARN_TWO = "arn:aws:connect:us-west-2:111111111111:instance/instanceId/security-profile/securityProfileId2";
+    protected static final String HIERARCHY_GROUP_ID = "userHierarchyGroupId";
+    protected static final String HIERARCHY_GROUP_ARN = "arn:aws:connect:us-west-2:111111111111:instance/instanceId/agent-group/userHierarchyGroupId";
+    protected static final String HIERARCHY_GROUP_ARN_TWO = "arn:aws:connect:us-west-2:111111111111:instance/instanceId/agent-group/userHierarchyGroupId2";
     protected static final String PHONE_NUMBER = "+14122770115";
     protected static final String PHONE_TYPE_DESK = "DESK_PHONE";
     protected static final Integer AFTER_CONTACT_WORK_TIME_LIMIT = 0;
@@ -40,27 +49,20 @@ public class UserTestDataProvider {
             VALID_TAG_KEY_TWO, VALID_TAG_VALUE_TWO);
     protected static final Map<String, String> TAGS_THREE = ImmutableMap.of(VALID_TAG_KEY_ONE, VALID_TAG_VALUE_ONE,
             VALID_TAG_KEY_THREE, VALID_TAG_VALUE_THREE);
-    protected static final Set<Tag> TAGS_SET_ONE = convertTagMapToSet(TAGS_ONE);
-    protected static final Set<Tag> TAGS_SET_TWO = convertTagMapToSet(TAGS_TWO);
+    protected static final Set<Tag> TAGS_SET_ONE = convertTagMapToSet();
 
-    protected static ResourceModel buildUserResourceModel() {
-        final UserPhoneConfig userPhoneConfig = UserPhoneConfig.builder()
-                .afterContactWorkTimeLimit(AFTER_CONTACT_WORK_TIME_LIMIT)
-                .autoAccept(Boolean.TRUE)
-                .deskPhoneNumber(PHONE_NUMBER)
-                .phoneType(PHONE_TYPE_DESK)
-                .build();
+    protected static ResourceModel buildUserDesiredStateResourceModel() {
+        final UserPhoneConfig userPhoneConfig = getUserPhoneConfig();
 
-        final UserIdentityInfo userIdentityInfo = UserIdentityInfo.builder()
-                .firstName(FIRST_NAME)
-                .lastName(LAST_NAME)
-                .email(EMAIL)
-                .build();
+        final UserIdentityInfo userIdentityInfo = getUserIdentityInfo(FIRST_NAME, LAST_NAME, EMAIL);
 
         return ResourceModel.builder()
                 .instanceArn(INSTANCE_ARN)
+                .username(USERNAME)
+                .password(USER_PASSWORD)
                 .routingProfileArn(ROUTING_PROFILE_ARN)
                 .userArn(USER_ARN)
+                .directoryUserId(DIRECTORY_USER_ID)
                 .securityProfileArns(Collections.singleton(SECURITY_PROFILE_ARN))
                 .phoneConfig(userPhoneConfig)
                 .identityInfo(userIdentityInfo)
@@ -68,7 +70,7 @@ public class UserTestDataProvider {
                 .build();
     }
 
-    protected static ResourceModel buildUserResourceModel1() {
+    protected static ResourceModel buildUserPreviousStateResourceModel() {
         final UserPhoneConfig userPhoneConfig = UserPhoneConfig.builder()
                 .afterContactWorkTimeLimit(AFTER_CONTACT_WORK_TIME_LIMIT)
                 .autoAccept(Boolean.TRUE)
@@ -84,12 +86,13 @@ public class UserTestDataProvider {
 
         return ResourceModel.builder()
                 .instanceArn(INSTANCE_ARN)
-                .routingProfileArn(ROUTING_PROFILE_ARN_2)
-                .securityProfileArns(Collections.singleton(SECURITY_PROFILE_ARN_2))
+                .routingProfileArn(ROUTING_PROFILE_ARN_TWO)
+                .directoryUserId(DIRECTORY_USER_ID)
+                .securityProfileArns(Collections.singleton(SECURITY_PROFILE_ARN_TWO))
                 .phoneConfig(userPhoneConfig)
                 .userArn(USER_ARN)
                 .identityInfo(userIdentityInfo)
-                .hierarchyGroupArn(HIERARCHY_GROUP_ARN_2)
+                .hierarchyGroupArn(HIERARCHY_GROUP_ARN_TWO)
                 .build();
     }
 
@@ -127,11 +130,9 @@ public class UserTestDataProvider {
                 .build();
     }
 
-    private static Set<Tag> convertTagMapToSet(Map<String, String> tagMap) {
+    private static Set<Tag> convertTagMapToSet() {
         Set<Tag> tags = Sets.newHashSet();
-        if (tagMap != null) {
-            tagMap.forEach((key, value) -> tags.add(Tag.builder().key(key).value(value).build()));
-        }
+        TAGS_ONE.forEach((key, value) -> tags.add(Tag.builder().key(key).value(value).build()));
         return tags;
     }
 }

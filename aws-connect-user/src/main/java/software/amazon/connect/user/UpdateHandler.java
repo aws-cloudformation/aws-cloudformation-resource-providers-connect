@@ -39,11 +39,17 @@ public class UpdateHandler extends BaseHandlerStd {
         final Set<Tag> desiredResourceTags = convertResourceTagsToSet(request.getDesiredResourceTags());
         final Set<Tag> tagsToRemove = Sets.difference(previousResourceTags, desiredResourceTags);
         final Set<Tag> tagsToAdd = Sets.difference(desiredResourceTags, previousResourceTags);
+
         logger.log(String.format("Invoked UpdateUserHandler with user:%s", desiredStateModel.getUserArn()));
 
         if (StringUtils.isNotEmpty(desiredStateModel.getInstanceArn()) && !desiredStateModel.getInstanceArn().equals(previousStateModel.getInstanceArn())) {
             throw new CfnInvalidRequestException("InstanceArn cannot be updated.");
         }
+
+        if (StringUtils.isNotEmpty(desiredStateModel.getDirectoryUserId()) && !desiredStateModel.getDirectoryUserId().equals(previousStateModel.getDirectoryUserId())) {
+            throw new CfnInvalidRequestException("DirectoryUserId cannot be updated.");
+        }
+
         return ProgressEvent.progress(request.getDesiredResourceState(), callbackContext)
                 .then(progress -> updateUserIdentityInfo(proxy, proxyClient, desiredStateModel, previousStateModel, progress, callbackContext, logger))
                 .then(progress -> updateUserPhoneConfig(proxy, proxyClient, desiredStateModel, previousStateModel, progress, callbackContext, logger))
