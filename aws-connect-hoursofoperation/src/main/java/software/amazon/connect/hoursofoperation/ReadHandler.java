@@ -52,8 +52,9 @@ public class ReadHandler extends BaseHandlerStd {
     private ResourceModel setHoursOfOperationProperties(final ResourceModel model, final HoursOfOperation hoursOfOperation) {
         final String instanceArn = ArnHelper.getInstanceArnFromHoursOfOperationArn(hoursOfOperation.hoursOfOperationArn());
         model.setInstanceArn(instanceArn);
-        model.setName(model.getName());
-        model.setDescription(model.getDescription());
+        model.setName(hoursOfOperation.name());
+        model.setDescription(hoursOfOperation.description());
+        model.setTimeZone(hoursOfOperation.timeZone());
         model.setTags(convertResourceTagsToSet(hoursOfOperation.tags()));
         model.setConfig(translateToResourceModelConfig(hoursOfOperation.config()));
         return model;

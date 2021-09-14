@@ -16,4 +16,3 @@ public class ClientBuilderTest {
         assertThat(client.toString().contains(CONNECT_CLIENT)).isTrue();
     }
 }
-

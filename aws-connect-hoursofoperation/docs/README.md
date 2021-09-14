@@ -124,4 +124,3 @@ For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::G
 #### HoursOfOperationArn
 
 The Amazon Resource Name (ARN) for the hours of operation.
-

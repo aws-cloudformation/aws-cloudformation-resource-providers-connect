@@ -21,4 +21,3 @@ Resources:
       Handler: software.amazon.connect.hoursofoperation.HandlerWrapper::testEntrypoint
       Runtime: java8
       CodeUri: ./target/aws-connect-hoursofoperation-handler-1.0-SNAPSHOT.jar
-

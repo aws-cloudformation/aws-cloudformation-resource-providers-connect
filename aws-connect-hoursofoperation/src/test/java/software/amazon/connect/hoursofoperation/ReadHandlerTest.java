@@ -33,8 +33,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.DAY_ONE;
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.HOURS_OF_OPERATION_ARN;
-import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.HOURS_OF_OPERATION_CONFIG_ONE;
-import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.HOURS_OF_OPERATION_CONFIG_TWO;
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.HOURS_OF_OPERATION_DESCRIPTION_ONE;
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.HOURS_OF_OPERATION_ID;
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.HOURS_OF_OPERATION_NAME_ONE;
@@ -45,7 +43,6 @@ import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataP
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.TAGS_ONE;
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.TIME_ZONE_ONE;
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.buildHoursOfOperationDesiredStateResourceModel;
-import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.getConfig;
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.getHoursOfOperationConfig;
 
 @ExtendWith(MockitoExtension.class)
@@ -112,9 +109,11 @@ public class ReadHandlerTest {
     @Test
     public void testHandleRequest_CfnNotFoundException_InvalidArn() {
         final ArgumentCaptor<DescribeHoursOfOperationRequest> describeHoursOfOperationRequestArgumentCaptor = ArgumentCaptor.forClass(DescribeHoursOfOperationRequest.class);
+        final ResourceModel model = buildHoursOfOperationDesiredStateResourceModel();
+        model.setHoursOfOperationArn(INVALID_HOURS_OF_OPERATION_ARN);
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                .desiredResourceState(buildHoursOfOperationResourceModelInvalidArn())
+                .desiredResourceState(model)
                 .build();
 
         assertThrows(CfnNotFoundException.class, () ->
@@ -149,17 +148,6 @@ public class ReadHandlerTest {
             assertThat(config.getStartTime().getHours()).isEqualTo(HOURS_ONE);
             assertThat(config.getStartTime().getMinutes()).isEqualTo(MINUTES_ONE);
         }
-    }
-
-    private ResourceModel buildHoursOfOperationResourceModelInvalidArn() {
-        return ResourceModel.builder()
-                .instanceArn(INSTANCE_ARN)
-                .hoursOfOperationArn(INVALID_HOURS_OF_OPERATION_ARN)
-                .name(HOURS_OF_OPERATION_NAME_ONE)
-                .description(HOURS_OF_OPERATION_DESCRIPTION_ONE)
-                .timeZone(TIME_ZONE_ONE)
-                .config(getConfig(HOURS_OF_OPERATION_CONFIG_ONE, HOURS_OF_OPERATION_CONFIG_TWO))
-                .build();
     }
 
     private HoursOfOperation getDescribeHoursOfOperationResponseObject() {
