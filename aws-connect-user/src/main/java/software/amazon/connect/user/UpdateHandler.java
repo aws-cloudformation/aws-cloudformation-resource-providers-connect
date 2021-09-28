@@ -76,6 +76,8 @@ public class UpdateHandler extends BaseHandlerStd {
                                                                                  final ProgressEvent<ResourceModel, CallbackContext> progress,
                                                                                  final CallbackContext context,
                                                                                  final Logger logger) {
+        requireNotNull(desiredStateModel.getIdentityInfo() , USER_IDENTITY_INFO);
+
         final boolean updateUserEmail = !StringUtils.equals(desiredStateModel.getIdentityInfo().getEmail(), previousStateModel.getIdentityInfo().getEmail());
         final boolean updateUserFirstName = !StringUtils.equals(desiredStateModel.getIdentityInfo().getFirstName(), previousStateModel.getIdentityInfo().getFirstName());
         final boolean updateUserLastName = !StringUtils.equals(desiredStateModel.getIdentityInfo().getLastName(), previousStateModel.getIdentityInfo().getLastName());
@@ -109,6 +111,8 @@ public class UpdateHandler extends BaseHandlerStd {
                                                                                 final ProgressEvent<ResourceModel, CallbackContext> progress,
                                                                                 final CallbackContext context,
                                                                                 final Logger logger) {
+        requireNotNull(desiredStateModel.getPhoneConfig() , USER_PHONE_CONFIG);
+
         final int desiredAfterContactWorkTimeLimit = desiredStateModel.getPhoneConfig().getAfterContactWorkTimeLimit() == null ? 0 : desiredStateModel.getPhoneConfig().getAfterContactWorkTimeLimit();
         final int previousAfterContactWorkTimeLimit = previousStateModel.getPhoneConfig().getAfterContactWorkTimeLimit() == null ? 0 : previousStateModel.getPhoneConfig().getAfterContactWorkTimeLimit();
 

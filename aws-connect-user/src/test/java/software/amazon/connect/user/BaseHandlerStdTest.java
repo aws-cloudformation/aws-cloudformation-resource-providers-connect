@@ -46,6 +46,8 @@ public class BaseHandlerStdTest {
     private static final String ACCESS_DENIED_ERROR_CODE = "AccessDeniedException";
     private static final String THROTTLING_ERROR_CODE = "TooManyRequestsException";
     private static final String CONNECT_EXCEPTION_ERROR_CODE = "ConnectException";
+    private static final String PARAMETER_NAME = "UserIdentityInfo";
+    private static final String MISSING_MANDATORY_PARAMETER_EXCEPTION_MESSAGE = "Invalid request provided: Required parameter missing " + PARAMETER_NAME;
 
     @Mock
     private ProxyClient<ConnectClient> proxyClient;
@@ -153,5 +155,12 @@ public class BaseHandlerStdTest {
         final ImmutableMap<String, String> tagMap = ImmutableMap.of(VALID_TAG_KEY_ONE, VALID_TAG_VALUE_ONE, VALID_TAG_KEY_TWO, VALID_TAG_VALUE_TWO);
         final Set<Tag> tagSet = ImmutableSet.of(new Tag(VALID_TAG_KEY_ONE, VALID_TAG_VALUE_ONE), new Tag(VALID_TAG_KEY_TWO, VALID_TAG_VALUE_TWO));
         assertThat(BaseHandlerStd.convertResourceTagsToSet(tagMap)).isEqualTo(tagSet);
+    }
+
+    @Test
+    public void testRequireNotNull() {
+        CfnInvalidRequestException cfnInvalidRequestException = assertThrows(CfnInvalidRequestException.class, () ->
+                BaseHandlerStd.requireNotNull(null, PARAMETER_NAME));
+        assertThat(MISSING_MANDATORY_PARAMETER_EXCEPTION_MESSAGE).isEqualTo(cfnInvalidRequestException.getMessage());
     }
 }

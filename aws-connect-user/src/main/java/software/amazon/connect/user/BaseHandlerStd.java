@@ -27,6 +27,7 @@ import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -34,8 +35,12 @@ import java.util.stream.Collectors;
 
 public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
 
+    protected static final String USER_PHONE_CONFIG = "UserPhoneConfig";
+    protected static final String USER_IDENTITY_INFO = "UserIdentityInfo";
+
     private static final String ACCESS_DENIED_ERROR_CODE = "AccessDeniedException";
     private static final String THROTTLING_ERROR_CODE = "TooManyRequestsException";
+    private static final String MISSING_MANDATORY_PARAMETER = "Required parameter missing %s";
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
@@ -92,6 +97,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     }
 
     protected static software.amazon.awssdk.services.connect.model.UserPhoneConfig translateToUserPhoneConfig(final ResourceModel model) {
+        requireNotNull(model.getPhoneConfig() , USER_PHONE_CONFIG);
 
         return software.amazon.awssdk.services.connect.model.UserPhoneConfig.builder()
                 .afterContactWorkTimeLimit(model.getPhoneConfig().getAfterContactWorkTimeLimit())
@@ -102,6 +108,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     }
 
     protected static software.amazon.awssdk.services.connect.model.UserIdentityInfo translateToUserIdentityInfo(final ResourceModel model) {
+        requireNotNull(model.getIdentityInfo() , USER_IDENTITY_INFO);
 
         return software.amazon.awssdk.services.connect.model.UserIdentityInfo.builder()
                 .email(model.getIdentityInfo().getEmail())
@@ -116,5 +123,11 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
                         .map(key -> Tag.builder().key(key).value(resourceTags.get(key)).build())
                         .collect(Collectors.toSet()))
                 .orElse(Sets.newHashSet());
+    }
+
+    protected static void requireNotNull(final Object object, final String parameterName) {
+        if (Objects.isNull(object)) {
+            throw new CfnInvalidRequestException(String.format(MISSING_MANDATORY_PARAMETER, parameterName));
+        }
     }
 }
