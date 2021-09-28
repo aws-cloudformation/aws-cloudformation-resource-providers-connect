@@ -85,6 +85,8 @@ public class UserTestDataProvider {
                 .build();
 
         return ResourceModel.builder()
+                .username(USERNAME)
+                .password(USER_PASSWORD)
                 .instanceArn(INSTANCE_ARN)
                 .routingProfileArn(ROUTING_PROFILE_ARN_TWO)
                 .directoryUserId(DIRECTORY_USER_ID)

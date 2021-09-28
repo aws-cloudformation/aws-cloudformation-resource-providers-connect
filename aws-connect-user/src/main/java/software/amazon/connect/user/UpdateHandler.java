@@ -50,6 +50,14 @@ public class UpdateHandler extends BaseHandlerStd {
             throw new CfnInvalidRequestException("DirectoryUserId cannot be updated.");
         }
 
+        if (StringUtils.isNotEmpty(desiredStateModel.getPassword()) && !desiredStateModel.getPassword().equals(previousStateModel.getPassword())) {
+            throw new CfnInvalidRequestException("Password cannot be updated.");
+        }
+
+        if (StringUtils.isNotEmpty(desiredStateModel.getUsername()) && !desiredStateModel.getUsername().equals(previousStateModel.getUsername())) {
+            throw new CfnInvalidRequestException("Username cannot be updated.");
+        }
+
         return ProgressEvent.progress(request.getDesiredResourceState(), callbackContext)
                 .then(progress -> updateUserIdentityInfo(proxy, proxyClient, desiredStateModel, previousStateModel, progress, callbackContext, logger))
                 .then(progress -> updateUserPhoneConfig(proxy, proxyClient, desiredStateModel, previousStateModel, progress, callbackContext, logger))
@@ -101,7 +109,10 @@ public class UpdateHandler extends BaseHandlerStd {
                                                                                 final ProgressEvent<ResourceModel, CallbackContext> progress,
                                                                                 final CallbackContext context,
                                                                                 final Logger logger) {
-        final boolean afterContactWorkTimeLimit = desiredStateModel.getPhoneConfig().getAfterContactWorkTimeLimit().intValue() != previousStateModel.getPhoneConfig().getAfterContactWorkTimeLimit().intValue();
+        final int desiredAfterContactWorkTimeLimit = desiredStateModel.getPhoneConfig().getAfterContactWorkTimeLimit() == null ? 0 : desiredStateModel.getPhoneConfig().getAfterContactWorkTimeLimit();
+        final int previousAfterContactWorkTimeLimit = previousStateModel.getPhoneConfig().getAfterContactWorkTimeLimit() == null ? 0 : previousStateModel.getPhoneConfig().getAfterContactWorkTimeLimit();
+
+        final boolean afterContactWorkTimeLimit = desiredAfterContactWorkTimeLimit != previousAfterContactWorkTimeLimit;
         final boolean autoAccept = desiredStateModel.getPhoneConfig().getAutoAccept() != previousStateModel.getPhoneConfig().getAutoAccept();
         final boolean deskPhoneNumber = !StringUtils.equals(desiredStateModel.getPhoneConfig().getDeskPhoneNumber(), previousStateModel.getPhoneConfig().getDeskPhoneNumber());
         final boolean phoneType = !StringUtils.equals(desiredStateModel.getPhoneConfig().getPhoneType(), previousStateModel.getPhoneConfig().getPhoneType());
