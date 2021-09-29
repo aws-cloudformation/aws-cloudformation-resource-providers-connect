@@ -76,11 +76,13 @@ public class UpdateHandler extends BaseHandlerStd {
                                                                                  final ProgressEvent<ResourceModel, CallbackContext> progress,
                                                                                  final CallbackContext context,
                                                                                  final Logger logger) {
-        requireNotNull(desiredStateModel.getIdentityInfo() , USER_IDENTITY_INFO);
+        final String desiredUpdateUserEmail = desiredStateModel.getIdentityInfo() == null ? "" : desiredStateModel.getIdentityInfo().getEmail();
+        final String desiredUpdateUserFirstName = desiredStateModel.getIdentityInfo() == null ? "" : desiredStateModel.getIdentityInfo().getFirstName();
+        final String desiredUpdateUserLastName = desiredStateModel.getIdentityInfo() == null ? "" : desiredStateModel.getIdentityInfo().getLastName();
 
-        final boolean updateUserEmail = !StringUtils.equals(desiredStateModel.getIdentityInfo().getEmail(), previousStateModel.getIdentityInfo().getEmail());
-        final boolean updateUserFirstName = !StringUtils.equals(desiredStateModel.getIdentityInfo().getFirstName(), previousStateModel.getIdentityInfo().getFirstName());
-        final boolean updateUserLastName = !StringUtils.equals(desiredStateModel.getIdentityInfo().getLastName(), previousStateModel.getIdentityInfo().getLastName());
+        final boolean updateUserEmail = !StringUtils.equals(desiredUpdateUserEmail , previousStateModel.getIdentityInfo().getEmail());
+        final boolean updateUserFirstName = !StringUtils.equals(desiredUpdateUserFirstName , previousStateModel.getIdentityInfo().getFirstName());
+        final boolean updateUserLastName = !StringUtils.equals(desiredUpdateUserLastName , previousStateModel.getIdentityInfo().getLastName());
 
         if (updateUserEmail || updateUserFirstName || updateUserLastName) {
             logger.log(String.format("Calling UpdateUserIdentityInfo API for user:%s", desiredStateModel.getUserArn()));

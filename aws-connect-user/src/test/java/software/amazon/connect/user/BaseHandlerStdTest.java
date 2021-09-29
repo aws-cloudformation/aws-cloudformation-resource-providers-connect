@@ -46,7 +46,7 @@ public class BaseHandlerStdTest {
     private static final String ACCESS_DENIED_ERROR_CODE = "AccessDeniedException";
     private static final String THROTTLING_ERROR_CODE = "TooManyRequestsException";
     private static final String CONNECT_EXCEPTION_ERROR_CODE = "ConnectException";
-    private static final String PARAMETER_NAME = "UserIdentityInfo";
+    private static final String PARAMETER_NAME = "UserPhoneConfig";
     private static final String MISSING_MANDATORY_PARAMETER_EXCEPTION_MESSAGE = "Invalid request provided: Required parameter missing " + PARAMETER_NAME;
 
     @Mock

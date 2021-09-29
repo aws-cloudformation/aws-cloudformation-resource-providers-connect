@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
 
     protected static final String USER_PHONE_CONFIG = "UserPhoneConfig";
-    protected static final String USER_IDENTITY_INFO = "UserIdentityInfo";
 
     private static final String ACCESS_DENIED_ERROR_CODE = "AccessDeniedException";
     private static final String THROTTLING_ERROR_CODE = "TooManyRequestsException";
@@ -108,12 +107,11 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     }
 
     protected static software.amazon.awssdk.services.connect.model.UserIdentityInfo translateToUserIdentityInfo(final ResourceModel model) {
-        requireNotNull(model.getIdentityInfo() , USER_IDENTITY_INFO);
 
         return software.amazon.awssdk.services.connect.model.UserIdentityInfo.builder()
-                .email(model.getIdentityInfo().getEmail())
-                .firstName(model.getIdentityInfo().getFirstName())
-                .lastName(model.getIdentityInfo().getLastName())
+                .email(model.getIdentityInfo() == null ? "" : model.getIdentityInfo().getEmail())
+                .firstName(model.getIdentityInfo() == null ? "" : model.getIdentityInfo().getFirstName())
+                .lastName(model.getIdentityInfo() == null ? "" : model.getIdentityInfo().getLastName())
                 .build();
     }
 
