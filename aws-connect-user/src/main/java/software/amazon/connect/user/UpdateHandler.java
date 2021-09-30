@@ -76,15 +76,7 @@ public class UpdateHandler extends BaseHandlerStd {
                                                                                  final ProgressEvent<ResourceModel, CallbackContext> progress,
                                                                                  final CallbackContext context,
                                                                                  final Logger logger) {
-        final String desiredUpdateUserEmail = desiredStateModel.getIdentityInfo() == null ? null : desiredStateModel.getIdentityInfo().getEmail();
-        final String desiredUpdateUserFirstName = desiredStateModel.getIdentityInfo() == null ? null : desiredStateModel.getIdentityInfo().getFirstName();
-        final String desiredUpdateUserLastName = desiredStateModel.getIdentityInfo() == null ? null : desiredStateModel.getIdentityInfo().getLastName();
-
-        final boolean updateUserEmail = !StringUtils.equals(desiredUpdateUserEmail , previousStateModel.getIdentityInfo().getEmail());
-        final boolean updateUserFirstName = !StringUtils.equals(desiredUpdateUserFirstName , previousStateModel.getIdentityInfo().getFirstName());
-        final boolean updateUserLastName = !StringUtils.equals(desiredUpdateUserLastName , previousStateModel.getIdentityInfo().getLastName());
-
-        if (updateUserEmail || updateUserFirstName || updateUserLastName) {
+        if (isUserIdentityInfoUpdated(desiredStateModel.getIdentityInfo(), previousStateModel.getIdentityInfo())) {
             logger.log(String.format("Calling UpdateUserIdentityInfo API for user:%s", desiredStateModel.getUserArn()));
             return proxy.initiate("connect::updateUserIdentityInfo", proxyClient, desiredStateModel, context)
                     .translateToServiceRequest(UpdateHandler::translateToUpdateUserIdentityInfoRequest)
@@ -95,6 +87,18 @@ public class UpdateHandler extends BaseHandlerStd {
                     "skipping updateUserIdentityInfo API call for user:%s", desiredStateModel.getUserArn()));
             return progress;
         }
+    }
+
+    private boolean isUserIdentityInfoUpdated(final UserIdentityInfo desiredUserIdentityInfo, final UserIdentityInfo previousUserIdentityInfo) {
+        if (desiredUserIdentityInfo == null && previousUserIdentityInfo == null) {
+            return false;
+        }
+        if (desiredUserIdentityInfo == null || previousUserIdentityInfo == null) {
+            return true;
+        }
+        return !desiredUserIdentityInfo.getFirstName().equals(previousUserIdentityInfo.getFirstName()) ||
+                !desiredUserIdentityInfo.getLastName().equals(previousUserIdentityInfo.getLastName()) ||
+                !desiredUserIdentityInfo.getEmail().equals(previousUserIdentityInfo.getEmail());
     }
 
     private static UpdateUserIdentityInfoRequest translateToUpdateUserIdentityInfoRequest(final ResourceModel model) {
