@@ -76,9 +76,9 @@ public class UpdateHandler extends BaseHandlerStd {
                                                                                  final ProgressEvent<ResourceModel, CallbackContext> progress,
                                                                                  final CallbackContext context,
                                                                                  final Logger logger) {
-        final String desiredUpdateUserEmail = desiredStateModel.getIdentityInfo() == null ? "" : desiredStateModel.getIdentityInfo().getEmail();
-        final String desiredUpdateUserFirstName = desiredStateModel.getIdentityInfo() == null ? "" : desiredStateModel.getIdentityInfo().getFirstName();
-        final String desiredUpdateUserLastName = desiredStateModel.getIdentityInfo() == null ? "" : desiredStateModel.getIdentityInfo().getLastName();
+        final String desiredUpdateUserEmail = desiredStateModel.getIdentityInfo() == null ? null : desiredStateModel.getIdentityInfo().getEmail();
+        final String desiredUpdateUserFirstName = desiredStateModel.getIdentityInfo() == null ? null : desiredStateModel.getIdentityInfo().getFirstName();
+        final String desiredUpdateUserLastName = desiredStateModel.getIdentityInfo() == null ? null : desiredStateModel.getIdentityInfo().getLastName();
 
         final boolean updateUserEmail = !StringUtils.equals(desiredUpdateUserEmail , previousStateModel.getIdentityInfo().getEmail());
         final boolean updateUserFirstName = !StringUtils.equals(desiredUpdateUserFirstName , previousStateModel.getIdentityInfo().getFirstName());

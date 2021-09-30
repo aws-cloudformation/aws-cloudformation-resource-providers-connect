@@ -107,11 +107,13 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     }
 
     protected static software.amazon.awssdk.services.connect.model.UserIdentityInfo translateToUserIdentityInfo(final ResourceModel model) {
-
+        if (model.getIdentityInfo() == null) {
+            return null;
+        }
         return software.amazon.awssdk.services.connect.model.UserIdentityInfo.builder()
-                .email(model.getIdentityInfo() == null ? "" : model.getIdentityInfo().getEmail())
-                .firstName(model.getIdentityInfo() == null ? "" : model.getIdentityInfo().getFirstName())
-                .lastName(model.getIdentityInfo() == null ? "" : model.getIdentityInfo().getLastName())
+                .email(model.getIdentityInfo().getEmail())
+                .firstName(model.getIdentityInfo().getFirstName())
+                .lastName(model.getIdentityInfo().getLastName())
                 .build();
     }
 
