@@ -44,10 +44,6 @@ _Required_: No
 
 _Type_: String
 
-_Minimum_: <code>1</code>
-
-_Maximum_: <code>100</code>
-
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
 #### LastName
@@ -57,9 +53,5 @@ The last name. This is required if you are using Amazon Connect or SAML for iden
 _Required_: No
 
 _Type_: String
-
-_Minimum_: <code>1</code>
-
-_Maximum_: <code>100</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
