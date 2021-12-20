@@ -50,6 +50,14 @@ public class UpdateHandler extends BaseHandlerStd {
             throw new CfnInvalidRequestException("DirectoryUserId cannot be updated.");
         }
 
+        if (StringUtils.isNotEmpty(desiredStateModel.getPassword()) && !desiredStateModel.getPassword().equals(previousStateModel.getPassword())) {
+            throw new CfnInvalidRequestException("Password cannot be updated.");
+        }
+
+        if (StringUtils.isNotEmpty(desiredStateModel.getUsername()) && !desiredStateModel.getUsername().equals(previousStateModel.getUsername())) {
+            throw new CfnInvalidRequestException("Username cannot be updated.");
+        }
+
         return ProgressEvent.progress(request.getDesiredResourceState(), callbackContext)
                 .then(progress -> updateUserIdentityInfo(proxy, proxyClient, desiredStateModel, previousStateModel, progress, callbackContext, logger))
                 .then(progress -> updateUserPhoneConfig(proxy, proxyClient, desiredStateModel, previousStateModel, progress, callbackContext, logger))
@@ -68,11 +76,7 @@ public class UpdateHandler extends BaseHandlerStd {
                                                                                  final ProgressEvent<ResourceModel, CallbackContext> progress,
                                                                                  final CallbackContext context,
                                                                                  final Logger logger) {
-        final boolean updateUserEmail = !StringUtils.equals(desiredStateModel.getIdentityInfo().getEmail(), previousStateModel.getIdentityInfo().getEmail());
-        final boolean updateUserFirstName = !StringUtils.equals(desiredStateModel.getIdentityInfo().getFirstName(), previousStateModel.getIdentityInfo().getFirstName());
-        final boolean updateUserLastName = !StringUtils.equals(desiredStateModel.getIdentityInfo().getLastName(), previousStateModel.getIdentityInfo().getLastName());
-
-        if (updateUserEmail || updateUserFirstName || updateUserLastName) {
+        if (isUserIdentityInfoUpdated(desiredStateModel.getIdentityInfo(), previousStateModel.getIdentityInfo())) {
             logger.log(String.format("Calling UpdateUserIdentityInfo API for user:%s", desiredStateModel.getUserArn()));
             return proxy.initiate("connect::updateUserIdentityInfo", proxyClient, desiredStateModel, context)
                     .translateToServiceRequest(UpdateHandler::translateToUpdateUserIdentityInfoRequest)
@@ -83,6 +87,18 @@ public class UpdateHandler extends BaseHandlerStd {
                     "skipping updateUserIdentityInfo API call for user:%s", desiredStateModel.getUserArn()));
             return progress;
         }
+    }
+
+    private boolean isUserIdentityInfoUpdated(final UserIdentityInfo desiredUserIdentityInfo, final UserIdentityInfo previousUserIdentityInfo) {
+        if (desiredUserIdentityInfo == null && previousUserIdentityInfo == null) {
+            return false;
+        }
+        if (desiredUserIdentityInfo == null || previousUserIdentityInfo == null) {
+            return true;
+        }
+        return !desiredUserIdentityInfo.getFirstName().equals(previousUserIdentityInfo.getFirstName()) ||
+                !desiredUserIdentityInfo.getLastName().equals(previousUserIdentityInfo.getLastName()) ||
+                !desiredUserIdentityInfo.getEmail().equals(previousUserIdentityInfo.getEmail());
     }
 
     private static UpdateUserIdentityInfoRequest translateToUpdateUserIdentityInfoRequest(final ResourceModel model) {
@@ -101,7 +117,12 @@ public class UpdateHandler extends BaseHandlerStd {
                                                                                 final ProgressEvent<ResourceModel, CallbackContext> progress,
                                                                                 final CallbackContext context,
                                                                                 final Logger logger) {
-        final boolean afterContactWorkTimeLimit = desiredStateModel.getPhoneConfig().getAfterContactWorkTimeLimit().intValue() != previousStateModel.getPhoneConfig().getAfterContactWorkTimeLimit().intValue();
+        requireNotNull(desiredStateModel.getPhoneConfig() , USER_PHONE_CONFIG);
+
+        final int desiredAfterContactWorkTimeLimit = desiredStateModel.getPhoneConfig().getAfterContactWorkTimeLimit() == null ? 0 : desiredStateModel.getPhoneConfig().getAfterContactWorkTimeLimit();
+        final int previousAfterContactWorkTimeLimit = previousStateModel.getPhoneConfig().getAfterContactWorkTimeLimit() == null ? 0 : previousStateModel.getPhoneConfig().getAfterContactWorkTimeLimit();
+
+        final boolean afterContactWorkTimeLimit = desiredAfterContactWorkTimeLimit != previousAfterContactWorkTimeLimit;
         final boolean autoAccept = desiredStateModel.getPhoneConfig().getAutoAccept() != previousStateModel.getPhoneConfig().getAutoAccept();
         final boolean deskPhoneNumber = !StringUtils.equals(desiredStateModel.getPhoneConfig().getDeskPhoneNumber(), previousStateModel.getPhoneConfig().getDeskPhoneNumber());
         final boolean phoneType = !StringUtils.equals(desiredStateModel.getPhoneConfig().getPhoneType(), previousStateModel.getPhoneConfig().getPhoneType());
