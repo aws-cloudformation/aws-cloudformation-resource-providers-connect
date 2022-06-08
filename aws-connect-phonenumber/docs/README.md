@@ -129,4 +129,3 @@ The phone number ARN
 #### Address
 
 The phone number e164 address.
-
