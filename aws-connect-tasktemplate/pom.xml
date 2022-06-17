@@ -247,12 +247,6 @@
                     <include>aws-connect-tasktemplate.json</include>
                 </includes>
             </resource>
-            <resource>
-                <directory>${project.basedir}/target/loaded-target-schemas</directory>
-                <includes>
-                    <include>**/*.json</include>
-                </includes>
-            </resource>
         </resources>
     </build>
 </project>
