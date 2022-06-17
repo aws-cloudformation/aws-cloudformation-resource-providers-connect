@@ -21,4 +21,3 @@ Resources:
       Handler: software.amazon.connect.tasktemplate.HandlerWrapper::testEntrypoint
       Runtime: java8
       CodeUri: ./target/aws-connect-tasktemplate-handler-1.0-SNAPSHOT.jar
-
