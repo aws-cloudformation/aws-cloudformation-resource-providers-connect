@@ -61,11 +61,13 @@ import static software.amazon.connect.user.UserTestDataProvider.HIERARCHY_GROUP_
 import static software.amazon.connect.user.UserTestDataProvider.INSTANCE_ARN;
 import static software.amazon.connect.user.UserTestDataProvider.INSTANCE_ARN_TWO;
 import static software.amazon.connect.user.UserTestDataProvider.LAST_NAME;
+import static software.amazon.connect.user.UserTestDataProvider.MOBILE;
 import static software.amazon.connect.user.UserTestDataProvider.PHONE_NUMBER;
 import static software.amazon.connect.user.UserTestDataProvider.PHONE_TYPE_DESK;
 import static software.amazon.connect.user.UserTestDataProvider.PHONE_TYPE_SOFT;
 import static software.amazon.connect.user.UserTestDataProvider.ROUTING_PROFILE_ARN;
 import static software.amazon.connect.user.UserTestDataProvider.ROUTING_PROFILE_ARN_TWO;
+import static software.amazon.connect.user.UserTestDataProvider.SECONDARY_EMAIL;
 import static software.amazon.connect.user.UserTestDataProvider.SECURITY_PROFILE_ARN;
 import static software.amazon.connect.user.UserTestDataProvider.SECURITY_PROFILE_ARN_TWO;
 import static software.amazon.connect.user.UserTestDataProvider.TAGS_ONE;
@@ -118,7 +120,7 @@ public class UpdateHandlerTest {
         final ResourceModel desiredResourceModel = ResourceModel.builder()
                 .userArn(USER_ARN)
                 .instanceArn(INSTANCE_ARN)
-                .identityInfo(getUserIdentityInfo(updateFirstName, LAST_NAME, EMAIL))
+                .identityInfo(getUserIdentityInfo(updateFirstName, LAST_NAME, EMAIL, SECONDARY_EMAIL, MOBILE))
                 .phoneConfig(getUserPhoneConfig())
                 .securityProfileArns(Collections.singleton(SECURITY_PROFILE_ARN))
                 .routingProfileArn(ROUTING_PROFILE_ARN)
@@ -155,6 +157,8 @@ public class UpdateHandlerTest {
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().firstName()).isEqualTo(updateFirstName);
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().lastName()).isEqualTo(LAST_NAME);
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().email()).isEqualTo(EMAIL);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().secondaryEmail()).isEqualTo(SECONDARY_EMAIL);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().mobile()).isEqualTo(MOBILE);
 
         verify(connectClient, times(1)).serviceName();
     }
@@ -166,7 +170,7 @@ public class UpdateHandlerTest {
         final ResourceModel desiredResourceModel = ResourceModel.builder()
                 .userArn(USER_ARN)
                 .instanceArn(INSTANCE_ARN)
-                .identityInfo(getUserIdentityInfo(FIRST_NAME, updateLastName, EMAIL))
+                .identityInfo(getUserIdentityInfo(FIRST_NAME, updateLastName, EMAIL, SECONDARY_EMAIL, MOBILE))
                 .phoneConfig(getUserPhoneConfig())
                 .securityProfileArns(Collections.singleton(SECURITY_PROFILE_ARN))
                 .routingProfileArn(ROUTING_PROFILE_ARN)
@@ -203,6 +207,8 @@ public class UpdateHandlerTest {
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().firstName()).isEqualTo(FIRST_NAME);
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().lastName()).isEqualTo(updateLastName);
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().email()).isEqualTo(EMAIL);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().secondaryEmail()).isEqualTo(SECONDARY_EMAIL);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().mobile()).isEqualTo(MOBILE);
 
         verify(connectClient, times(1)).serviceName();
     }
@@ -214,7 +220,7 @@ public class UpdateHandlerTest {
         final ResourceModel desiredResourceModel = ResourceModel.builder()
                 .userArn(USER_ARN)
                 .instanceArn(INSTANCE_ARN)
-                .identityInfo(getUserIdentityInfo(FIRST_NAME, LAST_NAME, updateEmail))
+                .identityInfo(getUserIdentityInfo(FIRST_NAME, LAST_NAME, updateEmail, SECONDARY_EMAIL, MOBILE))
                 .phoneConfig(getUserPhoneConfig())
                 .securityProfileArns(Collections.singleton(SECURITY_PROFILE_ARN))
                 .routingProfileArn(ROUTING_PROFILE_ARN)
@@ -251,10 +257,109 @@ public class UpdateHandlerTest {
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().firstName()).isEqualTo(FIRST_NAME);
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().lastName()).isEqualTo(LAST_NAME);
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().email()).isEqualTo(updateEmail);
-
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().secondaryEmail()).isEqualTo(SECONDARY_EMAIL);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().mobile()).isEqualTo(MOBILE);
         verify(connectClient, times(1)).serviceName();
     }
 
+
+    @Test
+    public void testHandleRequest_Success_UpdateSecondaryEmailOnly() {
+
+        final String updateSecondaryEmail = "update@gmail.com";
+        final ResourceModel desiredResourceModel = ResourceModel.builder()
+                .userArn(USER_ARN)
+                .instanceArn(INSTANCE_ARN)
+                .identityInfo(getUserIdentityInfo(FIRST_NAME, LAST_NAME, EMAIL, updateSecondaryEmail, MOBILE))
+                .phoneConfig(getUserPhoneConfig())
+                .securityProfileArns(Collections.singleton(SECURITY_PROFILE_ARN))
+                .routingProfileArn(ROUTING_PROFILE_ARN)
+                .hierarchyGroupArn(HIERARCHY_GROUP_ARN)
+                .tags(TAGS_SET_ONE)
+                .build();
+
+        final ArgumentCaptor<UpdateUserIdentityInfoRequest> updateUserIdentityInfoRequestArgumentCaptor = ArgumentCaptor.forClass(UpdateUserIdentityInfoRequest.class);
+
+        final UpdateUserIdentityInfoResponse updateUserIdentityInfoResponse = UpdateUserIdentityInfoResponse.builder().build();
+        when(proxyClient.client().updateUserIdentityInfo(updateUserIdentityInfoRequestArgumentCaptor.capture())).thenReturn(updateUserIdentityInfoResponse);
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(desiredResourceModel)
+                .previousResourceState(buildUserDesiredStateResourceModel())
+                .desiredResourceTags(TAGS_ONE)
+                .previousResourceTags(TAGS_ONE)
+                .build();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackContext()).isNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel()).isEqualTo(request.getDesiredResourceState());
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
+
+        verify(proxyClient.client()).updateUserIdentityInfo(updateUserIdentityInfoRequestArgumentCaptor.capture());
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().userId()).isEqualTo(USER_ARN);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().firstName()).isEqualTo(FIRST_NAME);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().lastName()).isEqualTo(LAST_NAME);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().email()).isEqualTo(EMAIL);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().secondaryEmail()).isEqualTo(updateSecondaryEmail);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().mobile()).isEqualTo(MOBILE);
+        verify(connectClient, times(1)).serviceName();
+    }
+
+    @Test
+    public void testHandleRequest_Success_UpdateMobileOnly() {
+
+        final String updateMobile = "+17745785123";
+        final ResourceModel desiredResourceModel = ResourceModel.builder()
+                .userArn(USER_ARN)
+                .instanceArn(INSTANCE_ARN)
+                .identityInfo(getUserIdentityInfo(FIRST_NAME, LAST_NAME, EMAIL, SECONDARY_EMAIL, updateMobile))
+                .phoneConfig(getUserPhoneConfig())
+                .securityProfileArns(Collections.singleton(SECURITY_PROFILE_ARN))
+                .routingProfileArn(ROUTING_PROFILE_ARN)
+                .hierarchyGroupArn(HIERARCHY_GROUP_ARN)
+                .tags(TAGS_SET_ONE)
+                .build();
+
+        final ArgumentCaptor<UpdateUserIdentityInfoRequest> updateUserIdentityInfoRequestArgumentCaptor = ArgumentCaptor.forClass(UpdateUserIdentityInfoRequest.class);
+
+        final UpdateUserIdentityInfoResponse updateUserIdentityInfoResponse = UpdateUserIdentityInfoResponse.builder().build();
+        when(proxyClient.client().updateUserIdentityInfo(updateUserIdentityInfoRequestArgumentCaptor.capture())).thenReturn(updateUserIdentityInfoResponse);
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(desiredResourceModel)
+                .previousResourceState(buildUserDesiredStateResourceModel())
+                .desiredResourceTags(TAGS_ONE)
+                .previousResourceTags(TAGS_ONE)
+                .build();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackContext()).isNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel()).isEqualTo(request.getDesiredResourceState());
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
+
+        verify(proxyClient.client()).updateUserIdentityInfo(updateUserIdentityInfoRequestArgumentCaptor.capture());
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().userId()).isEqualTo(USER_ARN);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().firstName()).isEqualTo(FIRST_NAME);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().lastName()).isEqualTo(LAST_NAME);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().email()).isEqualTo(EMAIL);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().secondaryEmail()).isEqualTo(SECONDARY_EMAIL);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().mobile()).isEqualTo(updateMobile);
+        verify(connectClient, times(1)).serviceName();
+    }
     @Test
     public void testHandleRequest_Success_PhoneConfig_UpdateAfterContactWorkTimeLimitOnly() {
 
@@ -591,7 +696,7 @@ public class UpdateHandlerTest {
         final ResourceModel desiredResourceModel = ResourceModel.builder()
                 .userArn(USER_ARN)
                 .instanceArn(INSTANCE_ARN)
-                .identityInfo(getUserIdentityInfo(FIRST_NAME_ONE, LAST_NAME, EMAIL))
+                .identityInfo(getUserIdentityInfo(FIRST_NAME_ONE, LAST_NAME, EMAIL, SECONDARY_EMAIL, MOBILE))
                 .phoneConfig(getUserPhoneConfig())
                 .securityProfileArns(Collections.singleton(SECURITY_PROFILE_ARN))
                 .routingProfileArn(ROUTING_PROFILE_ARN)
@@ -618,7 +723,8 @@ public class UpdateHandlerTest {
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().firstName()).isEqualTo(FIRST_NAME_ONE);
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().lastName()).isEqualTo(LAST_NAME);
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().email()).isEqualTo(EMAIL);
-
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().secondaryEmail()).isEqualTo(SECONDARY_EMAIL);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().mobile()).isEqualTo(MOBILE);
         verify(connectClient, times(1)).serviceName();
     }
 
@@ -805,6 +911,8 @@ public class UpdateHandlerTest {
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().firstName()).isEqualTo(FIRST_NAME);
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().lastName()).isEqualTo(LAST_NAME);
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().email()).isEqualTo(EMAIL);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().secondaryEmail()).isEqualTo(SECONDARY_EMAIL);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().mobile()).isEqualTo(MOBILE);
 
         verify(proxyClient.client()).updateUserPhoneConfig(updateUserPhoneConfigRequestArgumentCaptor.capture());
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
@@ -879,6 +987,8 @@ public class UpdateHandlerTest {
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().firstName()).isEqualTo(FIRST_NAME);
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().lastName()).isEqualTo(LAST_NAME);
         assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().email()).isEqualTo(EMAIL);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().secondaryEmail()).isEqualTo(SECONDARY_EMAIL);
+        assertThat(updateUserIdentityInfoRequestArgumentCaptor.getValue().identityInfo().mobile()).isEqualTo(MOBILE);
 
         verify(proxyClient.client()).updateUserPhoneConfig(updateUserPhoneConfigRequestArgumentCaptor.capture());
         assertThat(updateUserPhoneConfigRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);

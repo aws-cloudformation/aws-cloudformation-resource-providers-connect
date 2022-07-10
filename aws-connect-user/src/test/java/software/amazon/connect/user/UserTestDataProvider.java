@@ -35,9 +35,13 @@ public class UserTestDataProvider {
     protected static final String FIRST_NAME = "FIRST_NAME_TEST";
     protected static final String LAST_NAME = "LAST_NAME_TEST";
     protected static final String EMAIL = "email@gmail.com";
+    protected static final String SECONDARY_EMAIL = "secondary_email@gmail.com";
+    protected static final String MOBILE = "+7745781234";
     protected static final String FIRST_NAME_ONE = "FIRST_NAME_ONE_TEST";
     protected static final String LAST_NAME_ONE = "LAST_NAME_ONE_TEST";
     protected static final String EMAIL_ONE = "email1@gmail.com";
+    protected static final String SECONDARY_EMAIL_ONE = "secondary_email1@gmail.com";
+    protected static final String MOBILE_ONE = "+7745781235";
     protected static final String VALID_TAG_KEY_ONE = "TagKeyOne";
     protected static final String VALID_TAG_VALUE_ONE = "A";
     protected static final String VALID_TAG_KEY_TWO = "TagKeyTwo";
@@ -54,7 +58,7 @@ public class UserTestDataProvider {
     protected static ResourceModel buildUserDesiredStateResourceModel() {
         final UserPhoneConfig userPhoneConfig = getUserPhoneConfig();
 
-        final UserIdentityInfo userIdentityInfo = getUserIdentityInfo(FIRST_NAME, LAST_NAME, EMAIL);
+        final UserIdentityInfo userIdentityInfo = getUserIdentityInfo(FIRST_NAME, LAST_NAME, EMAIL, SECONDARY_EMAIL, MOBILE);
 
         return ResourceModel.builder()
                 .instanceArn(INSTANCE_ARN)
@@ -82,6 +86,8 @@ public class UserTestDataProvider {
                 .firstName(FIRST_NAME_ONE)
                 .lastName(LAST_NAME_ONE)
                 .email(EMAIL_ONE)
+                .secondaryEmail(SECONDARY_EMAIL_ONE)
+                .mobile(MOBILE_ONE)
                 .build();
 
         return ResourceModel.builder()
@@ -103,14 +109,18 @@ public class UserTestDataProvider {
                 .firstName(FIRST_NAME)
                 .lastName(LAST_NAME)
                 .email(EMAIL)
+                .secondaryEmail(SECONDARY_EMAIL)
+                .mobile(MOBILE)
                 .build();
     }
 
-    protected static UserIdentityInfo getUserIdentityInfo(String firstName, String lastName, String email) {
+    protected static UserIdentityInfo getUserIdentityInfo(String firstName, String lastName, String email, String secondaryEmail, String mobile) {
         return UserIdentityInfo.builder()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(email)
+                .secondaryEmail(secondaryEmail)
+                .mobile(mobile)
                 .build();
     }
 

@@ -83,7 +83,7 @@ public class UpdateHandler extends BaseHandlerStd {
                     .makeServiceCall((req, clientProxy) -> invoke(req, clientProxy, clientProxy.client()::updateUserIdentityInfo, logger))
                     .progress();
         } else {
-            logger.log(String.format("User Email, FirstName and LastName fields are unchanged in the update operation, " +
+            logger.log(String.format("User FirstName, LastName, Email, SecondaryEmail, and Mobile fields are unchanged in the update operation, " +
                     "skipping updateUserIdentityInfo API call for user:%s", desiredStateModel.getUserArn()));
             return progress;
         }
@@ -98,7 +98,9 @@ public class UpdateHandler extends BaseHandlerStd {
         }
         return !desiredUserIdentityInfo.getFirstName().equals(previousUserIdentityInfo.getFirstName()) ||
                 !desiredUserIdentityInfo.getLastName().equals(previousUserIdentityInfo.getLastName()) ||
-                !desiredUserIdentityInfo.getEmail().equals(previousUserIdentityInfo.getEmail());
+                !desiredUserIdentityInfo.getEmail().equals(previousUserIdentityInfo.getEmail()) ||
+                !desiredUserIdentityInfo.getSecondaryEmail().equals(previousUserIdentityInfo.getSecondaryEmail()) ||
+                !desiredUserIdentityInfo.getMobile().equals(previousUserIdentityInfo.getMobile());
     }
 
     private static UpdateUserIdentityInfoRequest translateToUpdateUserIdentityInfoRequest(final ResourceModel model) {
