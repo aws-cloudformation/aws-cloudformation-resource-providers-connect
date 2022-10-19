@@ -176,4 +176,3 @@ For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::G
 #### UserArn
 
 The Amazon Resource Name (ARN) for the user.
-
