@@ -38,10 +38,12 @@ import static software.amazon.connect.user.UserTestDataProvider.HIERARCHY_GROUP_
 import static software.amazon.connect.user.UserTestDataProvider.INSTANCE_ARN;
 import static software.amazon.connect.user.UserTestDataProvider.INVALID_USER_ARN;
 import static software.amazon.connect.user.UserTestDataProvider.LAST_NAME;
+import static software.amazon.connect.user.UserTestDataProvider.MOBILE;
 import static software.amazon.connect.user.UserTestDataProvider.PHONE_NUMBER;
 import static software.amazon.connect.user.UserTestDataProvider.PHONE_TYPE_DESK;
 import static software.amazon.connect.user.UserTestDataProvider.ROUTING_PROFILE_ARN;
 import static software.amazon.connect.user.UserTestDataProvider.ROUTING_PROFILE_ID;
+import static software.amazon.connect.user.UserTestDataProvider.SECONDARY_EMAIL;
 import static software.amazon.connect.user.UserTestDataProvider.SECURITY_PROFILE_ARN;
 import static software.amazon.connect.user.UserTestDataProvider.SECURITY_PROFILE_ID;
 import static software.amazon.connect.user.UserTestDataProvider.TAGS_ONE;
@@ -108,6 +110,8 @@ public class ReadHandlerTest {
         assertThat(response.getResourceModel().getIdentityInfo().getFirstName()).isEqualTo(FIRST_NAME);
         assertThat(response.getResourceModel().getIdentityInfo().getLastName()).isEqualTo(LAST_NAME);
         assertThat(response.getResourceModel().getIdentityInfo().getEmail()).isEqualTo(EMAIL);
+        assertThat(response.getResourceModel().getIdentityInfo().getSecondaryEmail()).isEqualTo(SECONDARY_EMAIL);
+        assertThat(response.getResourceModel().getIdentityInfo().getMobile()).isEqualTo(MOBILE);
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
 
@@ -166,7 +170,10 @@ public class ReadHandlerTest {
                 .identityInfo(software.amazon.awssdk.services.connect.model.UserIdentityInfo.builder()
                         .firstName(FIRST_NAME)
                         .lastName(LAST_NAME)
-                        .email(EMAIL).build())
+                        .email(EMAIL)
+                        .secondaryEmail(SECONDARY_EMAIL)
+                        .mobile(MOBILE)
+                        .build())
                 .phoneConfig(software.amazon.awssdk.services.connect.model.UserPhoneConfig.builder()
                         .phoneType(PhoneType.DESK_PHONE)
                         .afterContactWorkTimeLimit(0)

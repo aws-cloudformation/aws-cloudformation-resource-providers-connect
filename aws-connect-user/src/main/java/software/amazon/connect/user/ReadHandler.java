@@ -68,9 +68,11 @@ public class ReadHandler extends BaseHandlerStd {
 
     private software.amazon.connect.user.UserIdentityInfo translateToResourceModelUserIdentityInfo(final software.amazon.awssdk.services.connect.model.UserIdentityInfo userIdentityInfo) {
         final software.amazon.connect.user.UserIdentityInfo resourceModelUserIdentityInfo = new software.amazon.connect.user.UserIdentityInfo();
-        resourceModelUserIdentityInfo.setEmail(userIdentityInfo.email());
         resourceModelUserIdentityInfo.setFirstName(userIdentityInfo.firstName());
         resourceModelUserIdentityInfo.setLastName(userIdentityInfo.lastName());
+        resourceModelUserIdentityInfo.setEmail(userIdentityInfo.email());
+        resourceModelUserIdentityInfo.setSecondaryEmail(userIdentityInfo.secondaryEmail());
+        resourceModelUserIdentityInfo.setMobile(userIdentityInfo.mobile());
         return resourceModelUserIdentityInfo;
     }
 
