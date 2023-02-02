@@ -10,6 +10,7 @@ import software.amazon.awssdk.services.connect.model.InternalServiceException;
 import software.amazon.awssdk.services.connect.model.InvalidParameterException;
 import software.amazon.awssdk.services.connect.model.InvalidRequestException;
 import software.amazon.awssdk.services.connect.model.LimitExceededException;
+import software.amazon.awssdk.services.connect.model.ResourceInUseException;
 import software.amazon.awssdk.services.connect.model.ResourceNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnAccessDeniedException;
 import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
@@ -58,7 +59,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     protected static void handleCommonExceptions(final Exception ex, final Logger logger) {
         if (ex instanceof ResourceNotFoundException) {
             throw new CfnNotFoundException(ex);
-        } else if (ex instanceof InvalidParameterException || ex instanceof InvalidRequestException) {
+        } else if (ex instanceof InvalidParameterException || ex instanceof InvalidRequestException || ex instanceof ResourceInUseException) {
             throw new CfnInvalidRequestException(ex);
         } else if (ex instanceof InternalServiceException) {
             throw new CfnServiceInternalErrorException(ex);
