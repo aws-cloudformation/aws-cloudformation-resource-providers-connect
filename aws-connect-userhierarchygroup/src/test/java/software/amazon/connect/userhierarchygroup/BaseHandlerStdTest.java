@@ -14,6 +14,7 @@ import software.amazon.awssdk.services.connect.model.InternalServiceException;
 import software.amazon.awssdk.services.connect.model.InvalidParameterException;
 import software.amazon.awssdk.services.connect.model.InvalidRequestException;
 import software.amazon.awssdk.services.connect.model.LimitExceededException;
+import software.amazon.awssdk.services.connect.model.ResourceInUseException;
 import software.amazon.awssdk.services.connect.model.ResourceNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnAccessDeniedException;
 import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
@@ -116,6 +117,13 @@ public class BaseHandlerStdTest {
     public void testHandleCommonExceptions_LimitExceededException() {
         Exception ex = LimitExceededException.builder().build();
         assertThrows(CfnServiceLimitExceededException.class, () ->
+                BaseHandlerStd.handleCommonExceptions(ex, logger));
+    }
+
+    @Test
+    public void testHandleCommonExceptions_ResourceInUseException() {
+        Exception ex = ResourceInUseException.builder().build();
+        assertThrows(CfnInvalidRequestException.class, () ->
                 BaseHandlerStd.handleCommonExceptions(ex, logger));
     }
 
