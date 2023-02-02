@@ -119,13 +119,6 @@ public class BaseHandlerStdTest {
         assertThrows(CfnServiceLimitExceededException.class, () ->
                 BaseHandlerStd.handleCommonExceptions(ex, logger));
     }
-    
-    @Test
-    public void testHandleCommonExceptions_ResourceInUseException() {
-        Exception ex = ResourceInUseException.builder().build();
-        assertThrows(CfnInvalidRequestException.class, () ->
-                BaseHandlerStd.handleCommonExceptions(ex, logger));
-    }
 
     @Test
     public void testHandleCommonExceptions_ConnectException() {
@@ -136,6 +129,13 @@ public class BaseHandlerStdTest {
                 .statusCode(403)
                 .build();
         assertThrows(CfnGeneralServiceException.class, () ->
+                BaseHandlerStd.handleCommonExceptions(ex, logger));
+    }
+    
+    @Test
+    public void testHandleCommonExceptions_ResourceInUseException() {
+        Exception ex = ResourceInUseException.builder().build();
+        assertThrows(CfnInvalidRequestException.class, () ->
                 BaseHandlerStd.handleCommonExceptions(ex, logger));
     }
 
