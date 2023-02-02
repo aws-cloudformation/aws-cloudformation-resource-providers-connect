@@ -121,6 +121,13 @@ public class BaseHandlerStdTest {
     }
 
     @Test
+    public void testHandleCommonExceptions_ResourceInUseException() {
+        Exception ex = ResourceInUseException.builder().build();
+        assertThrows(CfnInvalidRequestException.class, () ->
+                BaseHandlerStd.handleCommonExceptions(ex, logger));
+    }
+
+    @Test
     public void testHandleCommonExceptions_ConnectException() {
         Exception ex = ConnectException.builder()
                 .awsErrorDetails(AwsErrorDetails.builder()
@@ -149,12 +156,5 @@ public class BaseHandlerStdTest {
         CfnInvalidRequestException cfnInvalidRequestException = assertThrows(CfnInvalidRequestException.class, () ->
                 BaseHandlerStd.requireNotNull(null, PARAMETER_NAME));
         assertThat(MISSING_MANDATORY_PARAMETER_EXCEPTION_MESSAGE).isEqualTo(cfnInvalidRequestException.getMessage());
-    }
-    
-    @Test
-    public void testHandleCommonExceptions_ResourceInUseException() {
-        Exception ex = ResourceInUseException.builder().build();
-        assertThrows(CfnInvalidRequestException.class, () ->
-                BaseHandlerStd.handleCommonExceptions(ex, logger));
     }
 }
