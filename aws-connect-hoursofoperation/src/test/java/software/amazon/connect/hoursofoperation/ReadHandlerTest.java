@@ -7,6 +7,8 @@ import software.amazon.awssdk.services.connect.ConnectClient;
 import software.amazon.awssdk.services.connect.model.DescribeHoursOfOperationRequest;
 import software.amazon.awssdk.services.connect.model.DescribeHoursOfOperationResponse;
 import software.amazon.awssdk.services.connect.model.HoursOfOperation;
+import software.amazon.awssdk.services.connect.model.ListHoursOfOperationOverridesRequest;
+import software.amazon.awssdk.services.connect.model.ListHoursOfOperationOverridesResponse;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,9 +24,13 @@ import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -40,10 +46,17 @@ import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataP
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.INSTANCE_ARN;
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.INVALID_HOURS_OF_OPERATION_ARN;
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.MINUTES_ONE;
+import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.NEXT_TOKEN;
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.TAGS_ONE;
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.TIME_ZONE_ONE;
+import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.buildHOOPEmptyOverrideDesiredStateResourceModel;
+import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.buildHOOPOverrideDesiredStateResourceModel;
+import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.buildHOOPOverrideDesiredStateResourceModelThree;
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.buildHoursOfOperationDesiredStateResourceModel;
 import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.getHoursOfOperationConfig;
+import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.getHoursOfOperationOverrideOne;
+import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.getHoursOfOperationOverrideTwo;
+import static software.amazon.connect.hoursofoperation.HoursOfOperationTestDataProvider.getListHOOPOverridesResponse;
 
 @ExtendWith(MockitoExtension.class)
 public class ReadHandlerTest {
@@ -70,40 +83,39 @@ public class ReadHandlerTest {
     }
 
     @Test
-    public void testHandleRequest_Success() {
+    public void testHandleRequestWithoutOverrides_Success() {
         final ArgumentCaptor<DescribeHoursOfOperationRequest> describeHoursOfOperationRequestArgumentCaptor = ArgumentCaptor.forClass(DescribeHoursOfOperationRequest.class);
+        final ArgumentCaptor<ListHoursOfOperationOverridesRequest> listHoursOfOperationOverridesRequestArgumentCaptor = ArgumentCaptor.forClass(ListHoursOfOperationOverridesRequest.class);
 
         final DescribeHoursOfOperationResponse describeHoursOfOperationResponse = DescribeHoursOfOperationResponse.builder()
                 .hoursOfOperation(getDescribeHoursOfOperationResponseObject())
                 .build();
 
-        when(proxyClient.client().describeHoursOfOperation(describeHoursOfOperationRequestArgumentCaptor.capture())).thenReturn(describeHoursOfOperationResponse);
-        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                .desiredResourceState(buildHoursOfOperationDesiredStateResourceModel())
+        final ListHoursOfOperationOverridesResponse listHoursOfOperationOverridesResponse = ListHoursOfOperationOverridesResponse.builder()
+                .hoursOfOperationOverrideList(new ArrayList<>())
                 .build();
 
-        final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+        when(proxyClient.client().describeHoursOfOperation(describeHoursOfOperationRequestArgumentCaptor.capture())).thenReturn(describeHoursOfOperationResponse);
+        when(proxyClient.client().listHoursOfOperationOverrides(listHoursOfOperationOverridesRequestArgumentCaptor.capture())).thenReturn(listHoursOfOperationOverridesResponse);
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(buildHOOPEmptyOverrideDesiredStateResourceModel())
+                .build();
 
-        assertThat(response).isNotNull();
-        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
-        assertThat(response.getCallbackContext()).isNull();
-        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
-        assertThat(response.getResourceModels()).isNull();
-        assertThat(response.getResourceModel().getInstanceArn()).isEqualTo(INSTANCE_ARN);
-        assertThat(response.getResourceModel().getHoursOfOperationArn()).isEqualTo(HOURS_OF_OPERATION_ARN);
-        assertThat(response.getResourceModel().getDescription()).isEqualTo(HOURS_OF_OPERATION_DESCRIPTION_ONE);
-        assertThat(response.getResourceModel().getName()).isEqualTo(HOURS_OF_OPERATION_NAME_ONE);
-        assertThat(response.getResourceModel().getConfig().size()).isEqualTo(1);
-        validateConfig(response.getResourceModel().getConfig());
-        assertThat(response.getResourceModel().getTimeZone()).isEqualTo(TIME_ZONE_ONE);
-        assertThat(response.getMessage()).isNull();
-        assertThat(response.getErrorCode()).isNull();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+        validateResponse(response);
 
         verify(proxyClient.client()).describeHoursOfOperation(describeHoursOfOperationRequestArgumentCaptor.capture());
         assertThat(describeHoursOfOperationRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
         assertThat(describeHoursOfOperationRequestArgumentCaptor.getValue().hoursOfOperationId()).isEqualTo(HOURS_OF_OPERATION_ARN);
 
-        verify(connectClient, times(1)).serviceName();
+        // override related fields
+        verify(proxyClient.client()).listHoursOfOperationOverrides(listHoursOfOperationOverridesRequestArgumentCaptor.capture());
+        ListHoursOfOperationOverridesRequest overrideRequest = listHoursOfOperationOverridesRequestArgumentCaptor.getValue();
+        assertEquals(INSTANCE_ARN, overrideRequest.instanceId());
+        assertEquals(HOURS_OF_OPERATION_ARN, overrideRequest.hoursOfOperationId());
+
+        verify(connectClient, times(2)).serviceName();
     }
 
     @Test
@@ -140,6 +152,118 @@ public class ReadHandlerTest {
         assertThat(describeHoursOfOperationRequestArgumentCaptor.getValue().hoursOfOperationId()).isEqualTo(HOURS_OF_OPERATION_ARN);
 
         verify(connectClient, times(1)).serviceName();
+    }
+
+    @Test
+    public void testHandleRequestWithOverridesAndNextToken_Success() {
+        final ArgumentCaptor<DescribeHoursOfOperationRequest> describeHoursOfOperationRequestArgumentCaptor = ArgumentCaptor.forClass(DescribeHoursOfOperationRequest.class);
+        final ArgumentCaptor<ListHoursOfOperationOverridesRequest> listHoursOfOperationOverridesRequestArgumentCaptor = ArgumentCaptor.forClass(ListHoursOfOperationOverridesRequest.class);
+
+        final DescribeHoursOfOperationResponse describeHoursOfOperationResponse = DescribeHoursOfOperationResponse.builder()
+                .hoursOfOperation(getDescribeHoursOfOperationResponseObject()).build();
+        final ListHoursOfOperationOverridesResponse listHoursOfOperationOverridesResponsePageOne = getListHOOPOverridesResponse(NEXT_TOKEN, getHoursOfOperationOverrideOne());
+        final ListHoursOfOperationOverridesResponse listHoursOfOperationOverridesResponsePageTwo = getListHOOPOverridesResponse(null, getHoursOfOperationOverrideTwo());
+
+        when(proxyClient.client().describeHoursOfOperation(describeHoursOfOperationRequestArgumentCaptor.capture())).thenReturn(describeHoursOfOperationResponse);
+        when(proxyClient.client().listHoursOfOperationOverrides(listHoursOfOperationOverridesRequestArgumentCaptor.capture())).thenReturn(listHoursOfOperationOverridesResponsePageOne)
+                .thenReturn(listHoursOfOperationOverridesResponsePageTwo);
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(buildHOOPOverrideDesiredStateResourceModelThree())
+                .build();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+        validateResponse(response);
+
+        verify(proxyClient.client()).describeHoursOfOperation(describeHoursOfOperationRequestArgumentCaptor.capture());
+        assertThat(describeHoursOfOperationRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
+        assertThat(describeHoursOfOperationRequestArgumentCaptor.getValue().hoursOfOperationId()).isEqualTo(HOURS_OF_OPERATION_ARN);
+
+        verify(proxyClient.client(), times(2)).listHoursOfOperationOverrides(listHoursOfOperationOverridesRequestArgumentCaptor.capture());
+        List<ListHoursOfOperationOverridesRequest> listOverrideRequest = listHoursOfOperationOverridesRequestArgumentCaptor.getAllValues();
+        assertEquals(INSTANCE_ARN, listOverrideRequest.get(0).instanceId());
+        assertEquals(HOURS_OF_OPERATION_ARN, listOverrideRequest.get(0).hoursOfOperationId());
+        assertNull(listOverrideRequest.get(0).nextToken());
+        assertEquals(INSTANCE_ARN, listOverrideRequest.get(1).instanceId());
+        assertEquals(HOURS_OF_OPERATION_ARN, listOverrideRequest.get(1).hoursOfOperationId());
+        assertEquals(NEXT_TOKEN, listOverrideRequest.get(1).nextToken());
+
+        verify(connectClient, times(2)).serviceName();
+    }
+
+    @Test
+    public void testHandleRequestWithOverridesWithoutNextToken_Success() {
+        final ArgumentCaptor<DescribeHoursOfOperationRequest> describeHoursOfOperationRequestArgumentCaptor = ArgumentCaptor.forClass(DescribeHoursOfOperationRequest.class);
+        final ArgumentCaptor<ListHoursOfOperationOverridesRequest> listHoursOfOperationOverridesRequestArgumentCaptor = ArgumentCaptor.forClass(ListHoursOfOperationOverridesRequest.class);
+
+        final DescribeHoursOfOperationResponse describeHoursOfOperationResponse = DescribeHoursOfOperationResponse.builder()
+                .hoursOfOperation(getDescribeHoursOfOperationResponseObject()).build();
+        final ListHoursOfOperationOverridesResponse listHoursOfOperationOverridesResponsePageOne = getListHOOPOverridesResponse(null, getHoursOfOperationOverrideOne());
+
+        when(proxyClient.client().describeHoursOfOperation(describeHoursOfOperationRequestArgumentCaptor.capture())).thenReturn(describeHoursOfOperationResponse);
+        when(proxyClient.client().listHoursOfOperationOverrides(listHoursOfOperationOverridesRequestArgumentCaptor.capture())).thenReturn(listHoursOfOperationOverridesResponsePageOne);
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(buildHOOPOverrideDesiredStateResourceModel())
+                .build();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+        validateResponse(response);
+
+        verify(proxyClient.client()).describeHoursOfOperation(describeHoursOfOperationRequestArgumentCaptor.capture());
+        assertThat(describeHoursOfOperationRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
+        assertThat(describeHoursOfOperationRequestArgumentCaptor.getValue().hoursOfOperationId()).isEqualTo(HOURS_OF_OPERATION_ARN);
+
+        verify(proxyClient.client(), times(1)).listHoursOfOperationOverrides(listHoursOfOperationOverridesRequestArgumentCaptor.capture());
+        ListHoursOfOperationOverridesRequest listOverrideRequest = listHoursOfOperationOverridesRequestArgumentCaptor.getValue();
+        assertEquals(INSTANCE_ARN, listOverrideRequest.instanceId());
+        assertEquals(HOURS_OF_OPERATION_ARN, listOverrideRequest.hoursOfOperationId());
+        assertNull(listOverrideRequest.nextToken());
+
+        verify(connectClient, times(2)).serviceName();
+    }
+
+    @Test
+    public void testHandleRequestWithOverrides_Exception() {
+        final ArgumentCaptor<DescribeHoursOfOperationRequest> describeHoursOfOperationRequestArgumentCaptor = ArgumentCaptor.forClass(DescribeHoursOfOperationRequest.class);
+        final ArgumentCaptor<ListHoursOfOperationOverridesRequest> listHoursOfOperationOverridesRequestArgumentCaptor = ArgumentCaptor.forClass(ListHoursOfOperationOverridesRequest.class);
+
+        final DescribeHoursOfOperationResponse describeHoursOfOperationResponse = DescribeHoursOfOperationResponse.builder()
+                .hoursOfOperation(getDescribeHoursOfOperationResponseObject())
+                .build();
+
+        when(proxyClient.client().describeHoursOfOperation(describeHoursOfOperationRequestArgumentCaptor.capture())).thenReturn(describeHoursOfOperationResponse);
+        when(proxyClient.client().listHoursOfOperationOverrides(listHoursOfOperationOverridesRequestArgumentCaptor.capture())).thenThrow(new RuntimeException());
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(buildHOOPEmptyOverrideDesiredStateResourceModel())
+                .build();
+
+        assertThrows(CfnGeneralServiceException.class, () ->
+                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+
+        verify(proxyClient.client()).describeHoursOfOperation(describeHoursOfOperationRequestArgumentCaptor.capture());
+        assertThat(describeHoursOfOperationRequestArgumentCaptor.getValue().instanceId()).isEqualTo(INSTANCE_ARN);
+        assertThat(describeHoursOfOperationRequestArgumentCaptor.getValue().hoursOfOperationId()).isEqualTo(HOURS_OF_OPERATION_ARN);
+
+        verify(connectClient, times(2)).serviceName();
+    }
+
+    private void validateResponse(ProgressEvent<ResourceModel, CallbackContext> response) {
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackContext()).isNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getResourceModel().getInstanceArn()).isEqualTo(INSTANCE_ARN);
+        assertThat(response.getResourceModel().getHoursOfOperationArn()).isEqualTo(HOURS_OF_OPERATION_ARN);
+        assertThat(response.getResourceModel().getDescription()).isEqualTo(HOURS_OF_OPERATION_DESCRIPTION_ONE);
+        assertThat(response.getResourceModel().getName()).isEqualTo(HOURS_OF_OPERATION_NAME_ONE);
+        assertThat(response.getResourceModel().getConfig().size()).isEqualTo(1);
+        validateConfig(response.getResourceModel().getConfig());
+        assertThat(response.getResourceModel().getTimeZone()).isEqualTo(TIME_ZONE_ONE);
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
     }
 
     private void validateConfig(Set<HoursOfOperationConfig> hoursOfOperationConfig) {

@@ -26,7 +26,7 @@ public class DeleteHandler extends BaseHandlerStd {
         logger.log(String.format("Invoked DeleteHoursOfOperationHandler with HoursOfOperationArn:%s", hoursOfOperationArn));
 
         if (!ArnHelper.isValidHoursOfOperationArn(hoursOfOperationArn)) {
-            throw new CfnNotFoundException(new CfnInvalidRequestException(String.format("%s is not a valid Hours Of Operation Arn", hoursOfOperationArn)));
+            throw new CfnNotFoundException(new CfnInvalidRequestException(String.format("The Hours of operation Arn provided in the request is not valid")));
         }
 
         return proxy.initiate("connect::deleteHoursOfOperation", proxyClient, model, callbackContext)
